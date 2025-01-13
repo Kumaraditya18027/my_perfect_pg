@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 
 const pgSchema = new mongoose.Schema(
   {
+    uuid: { type: String, default: uuidv4, unique: true },
     name: {
       type: String,
       required: true,
@@ -42,15 +44,15 @@ const pgSchema = new mongoose.Schema(
       fooding: { type: Boolean, required: true },
       foodingType: {
         type: [String],
-        enum: ["veg", "non-veg","Both"],
+        enum: ["veg", "non-veg", "Both"],
         required: true,
       },
-      ac: { type: Boolean},
+      ac: { type: Boolean },
       cctv: { type: Boolean },
-      wifi: { type: Boolean,},
-      laundry: { type: Boolean, },
-      parking: { type: Boolean, },
-      security: { type: Boolean, },
+      wifi: { type: Boolean },
+      laundry: { type: Boolean },
+      parking: { type: Boolean },
+      security: { type: Boolean },
       otherServices: [String],
     },
     description: {
@@ -76,31 +78,10 @@ const pgSchema = new mongoose.Schema(
       required: true,
     },
     pictures: [String],
-    ownerDetails: {
-      name: {
-        type: String,
-        required: true,
-      },
-      phone: {
-        type: String,
-        required: true,
-        validate: {
-          validator: function (v) {
-            return /\d{10}/.test(v); // Example validation for a 10-digit phone number
-          },
-          message: (props) => `${props.value} is not a valid phone number!`,
-        },
-      },
-      email: {
-        type: String,
-        required: true,
-        validate: {
-          validator: function (v) {
-            return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(v); // Email regex validation
-          },
-          message: (props) => `${props.value} is not a valid email address!`,
-        },
-      },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     profession: {
       type: String,
@@ -110,8 +91,12 @@ const pgSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isAdminVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Pg", pgSchema);
