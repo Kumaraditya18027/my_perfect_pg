@@ -23,34 +23,13 @@ async function uploadFileOnCloudinary(filePath) {
   if (uploadResult) {
     console.log(filePath);
     console.log(uploadResult);
-    if (filePath !== "public\\uploads\\dummy_blog.jpg") {
-      fs.unlinkSync(filePath);
-    }
-    if (filePath !== "public\\uploads\\default_event_image.jpg") {
+    if (filePath !== "uploads\\dummy_pg.jpg") {
       fs.unlinkSync(filePath);
     }
     return uploadResult.url;
   } else {
     return null;
   }
-
-  // Optimize delivery by resizing and applying auto-format and auto-quality
-  // const optimizeUrl = cloudinary.url("shoes", {
-  //   fetch_format: "auto",
-  //   quality: "auto",
-  // });
-
-  //   console.log(optimizeUrl);
-
-  // Transform the image: auto-crop to square aspect_ratio
-  // const autoCropUrl = cloudinary.url("shoes", {
-  //     crop: "auto",
-  //     gravity: "auto",
-  //     width: 500,
-  //     height: 500,
-  // });
-
-  // console.log(autoCropUrl);
 }
 
 module.exports = uploadFileOnCloudinary;
