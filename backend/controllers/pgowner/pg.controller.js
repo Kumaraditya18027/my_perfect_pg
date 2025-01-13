@@ -2,6 +2,7 @@ const asyncHandler = require("../../utils/asyncHandler");
 const Pg = require("../../models/pg.model");
 const { ApiError } = require("../../utils/customErrorHandler");
 const ResponseHandler = require("../../utils/responseHandler");
+const uploadFileOnCloudinary = require("../../utils/cloudinary");
 
 //add pg
 const addPg = asyncHandler(async (req, res) => {
@@ -14,7 +15,6 @@ const addPg = asyncHandler(async (req, res) => {
     description,
     location,
     timings,
-    pictures,
     profession,
   } = req.body;
 
@@ -36,7 +36,24 @@ const addPg = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All required fields must be provided!");
   }
 
-  // Create a new PG document
+  // multiple files for pictures
+  const pictureFiles = req.files;
+
+  if (!pictureFiles || pictureFiles.length === 0) {
+    throw new ApiError(400, "At least one picture must be uploaded!");
+  }
+
+  // Upload pictures to Cloudinary and collect the URLs
+  const pictureUrls = [];
+
+  for (const file of pictureFiles) {
+    const uploadedUrl = await uploadFileOnCloudinary(file.path); // Upload each file
+    if (uploadedUrl) {
+      pictureUrls.push(uploadedUrl); // Add the uploaded URL to the pictures array
+    }
+  }
+
+  // Create a new PG document with the uploaded picture URLs
   const pg = new Pg({
     name,
     address,
@@ -46,7 +63,7 @@ const addPg = asyncHandler(async (req, res) => {
     description,
     location,
     timings,
-    pictures,
+    pictures: pictureUrls,
     owner,
     profession,
   });
