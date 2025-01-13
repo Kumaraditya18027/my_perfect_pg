@@ -1,14 +1,27 @@
 const User = require("../../models/user.model");
 const asyncHandler = require("../../utils/asyncHandler");
-const { ValidationError, ApiError } = require("../../utils/customErrorHandler");
+const {
+  ValidationError,
+  ApiError,
+  NotFoundError,
+} = require("../../utils/customErrorHandler");
 const ResponseHandler = require("../../utils/responseHandler");
 
 //add user (pgowner/employee/user)
 const addUser = asyncHandler(async (req, res) => {
   const { name, email, username, password, role } = req.body;
+  const adminId = req.user._id;
 
-  if (!name || !email || !password || !role) {
+  if (!adminId || !name || !email || !password || !role) {
     throw new ValidationError("All fields are required !");
+  }
+
+  const admin = await User.findOne({
+    $and: [{ _id: adminId }, { role: "admin" }],
+  }).select("uuid role");
+
+  if (!admin) {
+    throw new NotFoundError("Admin not found!");
   }
 
   let newUUID;
@@ -43,6 +56,19 @@ const addUser = asyncHandler(async (req, res) => {
 //remove user (pgowner/employee/user)
 const removeUser = asyncHandler(async (req, res) => {
   const { uuid, userRole } = req.params; // Assuming the UUID is passed in the request params
+  const adminId = req.user._id;
+
+  if (!adminId) {
+    throw new ValidationError("Admin ID not found!");
+  }
+
+  const admin = await User.findOne({
+    $and: [{ _id: adminId }, { role: "admin" }],
+  }).select("uuid role");
+
+  if (!admin) {
+    throw new NotFoundError("Admin not found!");
+  }
 
   if (!uuid || !userRole) {
     throw new ValidationError("User UUID and role are required!");
@@ -71,6 +97,19 @@ const removeUser = asyncHandler(async (req, res) => {
 const editUser = asyncHandler(async (req, res) => {
   const { uuid, userRole } = req.params; // Assuming the UUID is passed in the request params
   const { name, email, username, password, role } = req.body;
+  const adminId = req.user._id;
+
+  if (!adminId) {
+    throw new ValidationError("Admin ID not found!");
+  }
+
+  const admin = await User.findOne({
+    $and: [{ _id: adminId }, { role: "admin" }],
+  }).select("uuid role");
+
+  if (!admin) {
+    throw new NotFoundError("Admin not found!");
+  }
 
   if (!uuid || !userRole) {
     throw new ValidationError("User UUID and role are required!");

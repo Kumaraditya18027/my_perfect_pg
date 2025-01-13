@@ -25,6 +25,19 @@ const getPgVerifyRequests = asyncHandler(async (req, res) => {
 //toggle verify pg
 const toggleVerifyPg = asyncHandler(async (req, res) => {
   const { pgId } = req.body;
+  const adminId = req.user._id;
+
+  if (!adminId) {
+    throw new ValidationError("Admin ID not found!");
+  }
+
+  const admin = await User.findOne({
+    $and: [{ _id: adminId }, { role: "admin" }],
+  }).select("uuid role");
+
+  if (!admin) {
+    throw new NotFoundError("Admin not found!");
+  }
 
   if (!pgId) {
     throw new ValidationError("PG ID is required!");
@@ -171,6 +184,19 @@ const getAllBookings = asyncHandler(async (req, res) => {
 //remove pg
 const removePg = asyncHandler(async (req, res) => {
   const { pgId } = req.body;
+  const adminId = req.user._id;
+
+  if (!adminId) {
+    throw new ValidationError("Admin ID not found!");
+  }
+
+  const admin = await User.findOne({
+    $and: [{ _id: adminId }, { role: "admin" }],
+  }).select("uuid role");
+
+  if (!admin) {
+    throw new NotFoundError("Admin not found!");
+  }
 
   if (!pgId) {
     throw new ValidationError("PG ID is required!");
