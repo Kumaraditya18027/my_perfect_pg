@@ -41,11 +41,16 @@ const UserInputForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Navigate to the next page with form data
-      router.push({
-        pathname: "/addroom", // Replace with your target page route
-        query: formData,
-      });
+      // Convert formData values to strings for query parameters
+      const query = Object.keys(formData).reduce((acc, key) => {
+        acc[key] = String(formData[key]);
+        return acc;
+      }, {});
+
+      // Navigate to the next page with the stringified query
+      const queryString = new URLSearchParams(query).toString();
+
+      router.push(`/pgowner/addroom?${queryString}`);
     }
   };
 

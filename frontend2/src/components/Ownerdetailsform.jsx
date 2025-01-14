@@ -1,28 +1,29 @@
+"use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const OwnerDetailsForm = () => {
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [gender, setGender] = useState('');
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [gender, setGender] = useState("");
   const [rooms, setRooms] = useState([]);
   const [services, setServices] = useState({});
-  const [description, setDescription] = useState('');
-  const [timings, setTimings] = useState('');
-  const [longitude, setLongitude] = useState('');
-  const [latitude, setLatitude] = useState('');
+  const [description, setDescription] = useState("");
+  const [timings, setTimings] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [latitude, setLatitude] = useState("");
   const [pictures, setPictures] = useState([]);
-  const [ownerName, setOwnerName] = useState('');
-  const [ownerPhone, setOwnerPhone] = useState('');
-  const [ownerEmail, setOwnerEmail] = useState('');
-  const [profession, setProfession] = useState('');
-  const [rating, setRating] = useState(''); // Add rating
+  const [ownerName, setOwnerName] = useState("");
+  const [ownerPhone, setOwnerPhone] = useState("");
+  const [ownerEmail, setOwnerEmail] = useState("");
+  const [profession, setProfession] = useState("");
+  const [rating, setRating] = useState(""); // Add rating
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
     profession: "",
-    address: "",  // Add address here
+    address: "", // Add address here
     pictures: [],
     deleted: false,
   });
@@ -35,26 +36,31 @@ const OwnerDetailsForm = () => {
   useEffect(() => {
     if (router.isReady) {
       // Access the raw query object
-      console.log("Raw query parameters:", router.query);  // Log the raw query parameters
-  
-      try {
-        const rawRooms = router.query.rooms;  // Access the query parameter directly
-        const rawServices = router.query.services;
-        const rawData = router.query;  
+      console.log("Raw query parameters:", router.query); // Log the raw query parameters
 
-  
+      try {
+        const rawRooms = router.query.rooms; // Access the query parameter directly
+        const rawServices = router.query.services;
+        const rawData = router.query;
+
         // Check if the query parameters are non-empty strings before parsing
-        const parsedRooms = typeof rawRooms === 'string' && rawRooms.trim() !== '' ? JSON.parse(rawRooms) : [];
-        const parsedServices = typeof rawServices === 'string' && rawServices.trim() !== '' ? JSON.parse(rawServices) : {};
-  
+        const parsedRooms =
+          typeof rawRooms === "string" && rawRooms.trim() !== ""
+            ? JSON.parse(rawRooms)
+            : [];
+        const parsedServices =
+          typeof rawServices === "string" && rawServices.trim() !== ""
+            ? JSON.parse(rawServices)
+            : {};
+
         console.log("Parsed Rooms:", parsedRooms);
         console.log("Parsed Services:", parsedServices);
-        setName(rawData.name);  // Set the name here
-        setAddress(rawData.address);  // Set the address here
+        setName(rawData.name); // Set the name here
+        setAddress(rawData.address); // Set the address here
         setGender(rawData.gender);
         setDescription(rawData.description);
         setTimings(rawData.timings);
-         setLongitude(rawData.longitude);
+        setLongitude(rawData.longitude);
         setLatitude(rawData.latitude);
         setPictures(rawData.pictures);
         // setOwnerName(rawData.ownerDetails.name);
@@ -70,22 +76,21 @@ const OwnerDetailsForm = () => {
       }
     }
   }, [router.isReady]);
-  
-  
+
   function formatServices(parsedServices) {
     return {
-      fooding: parsedServices.fooding || false,  // default to false if not provided
-      foodingType: parsedServices.foodingType || "veg",  // default to "veg" if not provided
-      ac: parsedServices.ac || false,  // default to false if not provided
-      cctv: parsedServices.cctv || false,  // default to false if not provided
-      wifi: parsedServices.wifi || false,  // default to false if not provided
-      laundry: parsedServices.laundry || false,  // default to false if not provided
-      parking: parsedServices.parking || false,  // default to false if not provided
-      security: parsedServices.security || false,  // default to false if not provided
-      otherServices: parsedServices.otherServices || []  // default to empty array if not provided
+      fooding: parsedServices.fooding || false, // default to false if not provided
+      foodingType: parsedServices.foodingType || "veg", // default to "veg" if not provided
+      ac: parsedServices.ac || false, // default to false if not provided
+      cctv: parsedServices.cctv || false, // default to false if not provided
+      wifi: parsedServices.wifi || false, // default to false if not provided
+      laundry: parsedServices.laundry || false, // default to false if not provided
+      parking: parsedServices.parking || false, // default to false if not provided
+      security: parsedServices.security || false, // default to false if not provided
+      otherServices: parsedServices.otherServices || [], // default to empty array if not provided
     };
   }
-  
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -93,11 +98,14 @@ const OwnerDetailsForm = () => {
     if (!formData.phone || !/\d{10}/.test(formData.phone)) {
       newErrors.phone = "Phone must be a valid 10-digit number";
     }
-    if (!formData.email || !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
+    if (
+      !formData.email ||
+      !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)
+    ) {
       newErrors.email = "Email must be a valid email address";
     }
     if (!formData.profession) newErrors.profession = "Profession is required";
-    if (!formData.address) newErrors.address = "Address is required";  // Validate address
+    if (!formData.address) newErrors.address = "Address is required"; // Validate address
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -134,12 +142,12 @@ const OwnerDetailsForm = () => {
       // Prepare the data to match the schema
       const data = {
         name,
-        address,  // Use address here
+        address, // Use address here
         gender,
         rooms,
         services,
         description,
-        rating,  // Use rating here
+        rating, // Use rating here
         location: {
           longitude,
           latitude,
@@ -154,31 +162,33 @@ const OwnerDetailsForm = () => {
         profession,
       };
 
-      console.log('Data to be submitted to the backend:', data);
+      console.log("Data to be submitted to the backend:", data);
 
       // Optionally send the data to the backend
-      fetch('http://localhost:5000/api/pg/create', {
-        method: 'POST',
+      fetch("http://localhost:5000/api/pg/create", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       })
-      .then(response => response.json())
-      .then(result => console.log('PG listing created:', result))
-      .catch(error => console.error('Error:', error));
-     }
+        .then((response) => response.json())
+        .then((result) => console.log("PG listing created:", result))
+        .catch((error) => console.error("Error:", error));
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4 mt-[4rem]">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4">
       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Owner Details</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Name *</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Name *
+            </label>
             <input
               type="text"
               name="name"
@@ -187,12 +197,16 @@ const OwnerDetailsForm = () => {
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
               placeholder="Enter your name"
             />
-            {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+            )}
           </div>
 
           {/* Phone */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Phone *</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Phone *
+            </label>
             <input
               type="text"
               name="phone"
@@ -201,12 +215,16 @@ const OwnerDetailsForm = () => {
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
               placeholder="Enter your phone number"
             />
-            {errors.phone && <p className="mt-1 text-sm text-red-500">{errors.phone}</p>}
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
+            )}
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Email *</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Email *
+            </label>
             <input
               type="email"
               name="email"
@@ -215,12 +233,16 @@ const OwnerDetailsForm = () => {
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
               placeholder="Enter your email"
             />
-            {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+            )}
           </div>
 
           {/* Profession */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Profession of student allowed in pg*</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Profession of student allowed in pg*
+            </label>
             <select
               name="profession"
               value={formData.profession}
@@ -234,12 +256,16 @@ const OwnerDetailsForm = () => {
                 </option>
               ))}
             </select>
-            {errors.profession && <p className="mt-1 text-sm text-red-500">{errors.profession}</p>}
+            {errors.profession && (
+              <p className="mt-1 text-sm text-red-500">{errors.profession}</p>
+            )}
           </div>
 
           {/* Address */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Address *</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Address *
+            </label>
             <input
               type="text"
               name="address"
@@ -248,12 +274,16 @@ const OwnerDetailsForm = () => {
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
               placeholder="Enter the address"
             />
-            {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address}</p>}
+            {errors.address && (
+              <p className="mt-1 text-sm text-red-500">{errors.address}</p>
+            )}
           </div>
 
           {/* Pictures */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Pictures</label>
+            <label className="block text-gray-700 font-medium mb-1">
+              Pictures
+            </label>
             <input
               type="file"
               multiple

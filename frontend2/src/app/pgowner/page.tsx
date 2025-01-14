@@ -1,19 +1,11 @@
-import Navbar from "@/components/MainNavbar";
-import UserInputForm from "@/components/UploadPgForm";
-
-import React from "react";
-
-const addPg = () => {
+// app/pgowner/page.tsx
+const PgOwnerHome = () => {
   return (
-    <>
-      <div className="mb-2">
-        <Navbar />
-      </div>
-      <div className="mt-4">
-        <UserInputForm />
-      </div>
-    </>
+    <div>
+      <h1 className="text-2xl font-bold">Welcome, PG Owner!</h1>
+      <p>Select an option from the navbar to manage your PG.</p>
+    </div>
   );
 };
 
-export default addPg;
+export default PgOwnerHome;
