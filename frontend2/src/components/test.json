@@ -1,0 +1,63 @@
+{
+  "name": "Midland Pg",
+  "address": "kjbaskbs",
+  "gender": "male",
+  "rooms": [
+    {
+      "type": "single",
+      "features": {
+        "ac": true,
+        "furnished": false
+      },
+      "rates": {
+        "monthly": "12000"
+      },
+      "availability": {
+        "count": 0,
+        "booked": 0
+      },
+      "pictures": []
+    },
+    {
+      "type": "double",
+      "features": {
+        "ac": true,
+        "furnished": true
+      },
+      "rates": {
+        "monthly": "40000"
+      },
+      "availability": {
+        "count": 0,
+        "booked": 0
+      },
+      "pictures": [
+        "Sign up.png"
+      ]
+    }
+  ],
+  "services": {
+    "fooding": true,
+    "foodingType": "non-veg",
+    "ac": true,
+    "cctv": true,
+    "wifi": false,
+    "laundry": true,
+    "parking": false,
+    "security": false,
+    "otherServices": []
+  },
+  "description": "basdkksda",
+  "rating": "",
+  "location": {
+    "longitude": "1234",
+    "latitude": "5678"
+  },
+  "timings": "9AM-10AM",
+  "ownerDetails": {
+    "name": "Utsav",
+    "phone": "1234567890",
+    "email": "jbab@gmail.com"
+  },
+  "profession": "Working Professionals"
+}
