@@ -16,6 +16,6 @@ const storage = multer.diskStorage({
 });
 
 // Creating the multer instance to accept multiple files (pictures)
-const upload = multer({ storage: storage }).array("pictures", 10);
+const upload = multer({ storage: storage });
 
 module.exports = upload;
