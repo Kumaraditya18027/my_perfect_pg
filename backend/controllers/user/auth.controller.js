@@ -17,6 +17,7 @@ const generateTokens = async (userId) => {
     await user.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (error) {
+    console.log(error);
     throw new ApiError(500, "Access token, Refresh token generating failed !");
   }
 };
@@ -106,7 +107,10 @@ const loginUser = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
     .json(
-      new ResponseHandler(201, "User logged in successfully", loggedInUser)
+      new ResponseHandler(201, "User logged in successfully", {
+        accessToken,
+        user: loggedInUser,
+      })
     );
 });
 
