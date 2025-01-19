@@ -14,26 +14,36 @@ const {
   toggleVerifyPg,
   updateBookingStatus,
 } = require("../controllers/admin/pg.controller.js");
+const {
+  addUser,
+  removeUser,
+  editUser,
+} = require("../controllers/admin/user.controller.js");
 
 //authentication
 router.route("/admin-login").post(loginUser);
-router.route("/admin-logout").post(authHandler, logoutUser);
+router.route("/admin-logout").post(authHandler(), logoutUser);
+
+//user management
+router.route("/add-user").post(authHandler(), addUser);
+router.route("/remove-user").delete(authHandler(), removeUser);
+router.route("/edit-user").patch(authHandler(), editUser);
 
 //pg verification
 router
   .route("/admin/get-pgVerification-requests")
-  .get(authHandler, getPgVerifyRequests);
-router.route("/admin/toggle-pgVerfication").post(authHandler, toggleVerifyPg);
+  .get(authHandler(), getPgVerifyRequests);
+router.route("/admin/toggle-pgVerfication").post(authHandler(), toggleVerifyPg);
 
 //pg bookings
-router.route("/admin/create-booking").post(authHandler, createBooking);
-router.route("/admin/get-all-bookings").post(authHandler, getAllBookings);
+router.route("/admin/create-booking").post(authHandler(), createBooking);
+router.route("/admin/get-all-bookings").post(authHandler(), getAllBookings);
 router
   .route("/admin/update-bookingStatus")
-  .patch(authHandler, updateBookingStatus);
+  .patch(authHandler(), updateBookingStatus);
 
 //pg operation
-router.route("/admin/get-all-pgs").get(authHandler, getAllPgsListed);
-router.route("/admin/remove-pg").delete(authHandler, removePg);
+router.route("/admin/get-all-pgs").get(authHandler(), getAllPgsListed);
+router.route("/admin/remove-pg").delete(authHandler(), removePg);
 
 module.exports = router;
