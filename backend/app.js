@@ -6,10 +6,13 @@ const customerRouter = require("./routes/customer.route");
 const pgownerRouter = require("./routes/pgowner.route");
 const testRouter = require("./routes/test.route");
 const app = express();
+const dotenv = require("dotenv");
+dotenv.config();
 
 // Middleware
 app.use(express.json());
 const cors = require("cors");
+const defaultErrorHandler = require("./middlewares/defaultErrorHandler");
 app.use(
   cors({
     origin: "*", // Allowing specific origin
@@ -24,6 +27,8 @@ app.use("/api/v1", adminRouter);
 app.use("/api/v1", customerRouter);
 app.use("/api/v1", pgownerRouter);
 app.use("/test", testRouter);
+
+app.use(defaultErrorHandler);
 
 // MongoDB Connection
 const MONGO_URI = "mongodb://localhost:27017/perfectpg"; // Replace 'pg-management' with your database name
