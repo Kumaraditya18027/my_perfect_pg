@@ -6,6 +6,7 @@ const {
   NotFoundError,
 } = require("../../utils/customErrorHandler");
 const ResponseHandler = require("../../utils/responseHandler");
+const { v4: uuidv4 } = require("uuid");
 
 //add user (pgowner/employee/user)
 const addUser = asyncHandler(async (req, res) => {
