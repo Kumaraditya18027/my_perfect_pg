@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext"; // Import the AuthContext hook
+import { useAuth } from "../AuthContext"; // Import the AuthContext hook
 import HomeNavbar from "@/components/HomeNavbar";
 
 const RegisterForm = () => {

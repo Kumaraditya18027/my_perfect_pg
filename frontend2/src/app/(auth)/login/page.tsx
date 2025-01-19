@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext"; // Import the AuthContext
+import { useAuth } from "../AuthContext"; // Import the AuthContext
 import HomeNavbar from "@/components/HomeNavbar"; // Assuming you have this component
 import Link from "next/link";
 
