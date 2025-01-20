@@ -68,15 +68,31 @@ const registerUser = asyncHandler(async (req, res) => {
 
 //login user
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, userType } = req.body;
 
   //checking if any field is unfilled
-  if (!email || !password) {
+  if (!email || !password || !userType) {
     throw new ApiError(400, "All fields are required !");
   }
 
+  var role;
+  switch (userType) {
+    case "Student":
+      role = "customer";
+      break;
+    case "Admin":
+      role = "admin";
+      break;
+    case "Owner":
+      role = "pgowner";
+      break;
+    default:
+      role = "";
+      break;
+  }
+
   //checking if the user exists or not
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ $and: [{ email }, { role }] });
   if (!user) {
     throw new ApiError(409, "User not exists ! Please register !");
   }
