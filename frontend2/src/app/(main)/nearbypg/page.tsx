@@ -1,8 +1,7 @@
 "use client";
 import MainNavbar from "@/components/MainNavbar";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const LocationIcon = () => (
   <svg
@@ -57,13 +56,7 @@ const ChevronRightIcon = () => (
 );
 
 const PGListing = () => {
-  const router = useRouter();
   const [hoveredId, setHoveredId] = useState(null);
-  useEffect(() => {
-    if (localStorage.getItem("isLoggedIn") === "false") {
-      router.push("/Login");
-    }
-  }, []);
 
   const listings = [
     {

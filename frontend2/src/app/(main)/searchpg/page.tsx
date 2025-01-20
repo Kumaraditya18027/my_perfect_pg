@@ -2,8 +2,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 const SearchIcon = () => (
   <svg
@@ -40,7 +39,6 @@ const LocationIcon = () => (
 );
 
 const PGShowcase = () => {
-  const router = useRouter();
   const [selectedFilters, setSelectedFilters] = useState({
     priceRange: "all",
     roomType: "all",
@@ -48,12 +46,6 @@ const PGShowcase = () => {
   });
   const [searchPg, setSearchPg] = useState("");
   const [sortPg, setSortPg] = useState("recommended");
-
-  useEffect(() => {
-    if (localStorage.getItem("isLoggedIn") === "false") {
-      router.push("/Login");
-    }
-  }, []);
 
   const pgs = [
     {
