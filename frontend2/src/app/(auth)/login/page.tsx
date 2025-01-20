@@ -24,7 +24,7 @@ const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/Pg");
+      router.replace("/searchpg");
     }
   }, [isAuthenticated, router]);
 

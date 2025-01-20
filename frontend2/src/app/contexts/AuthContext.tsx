@@ -23,7 +23,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.setItem("authToken", token);
       localStorage.setItem("isLoggedIn", true);
       setIsAuthenticated(true);
-      router.push("/Pg"); // Replace with your desired route
+
+      if (userType === "Admin") {
+        console.log("Going to admin page...");
+        router.push("/admin");
+        return;
+      } else if (userType === "Owner") {
+        console.log("Going to owner page...");
+        router.push("/pgowner");
+        return;
+      } else {
+        console.log("Going to user search page...");
+        router.push("/searchpg");
+        return;
+      }
     }
   };
 
