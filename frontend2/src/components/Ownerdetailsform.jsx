@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 const OwnerDetailsForm = () => {
   const [name, setName] = useState("");
@@ -17,77 +17,90 @@ const OwnerDetailsForm = () => {
   const [ownerPhone, setOwnerPhone] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
   const [profession, setProfession] = useState("");
-  const [rating, setRating] = useState(""); // Add rating
+  const [rating, setRating] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
     profession: "",
-    address: "", // Add address here
+    address: "",
     pictures: [],
     deleted: false,
   });
-  const router = useRouter();
   const [errors, setErrors] = useState({});
   const [imagePreviews, setImagePreviews] = useState([]);
 
+  const searchParams = useSearchParams();
   const professions = ["Students", "Working Professionals"];
 
   useEffect(() => {
-    if (router.isReady) {
-      // Access the raw query object
-      console.log("Raw query parameters:", router.query); // Log the raw query parameters
+    console.log('useEffect triggered');
+    
+    try {
+      // Log all search parameters
+      const paramsObject = {};
+      searchParams.forEach((value, key) => {
+        paramsObject[key] = value;
+      });
+      console.log("All search parameters:", paramsObject);
 
-      try {
-        const rawRooms = router.query.rooms; // Access the query parameter directly
-        const rawServices = router.query.services;
-        const rawData = router.query;
+      // Get and parse rooms
+      const rawRooms = searchParams.get('rooms');
+      console.log("Raw rooms:", rawRooms);
+      const parsedRooms = rawRooms ? JSON.parse(rawRooms) : [];
+      console.log("Parsed rooms:", parsedRooms);
+      setRooms(parsedRooms);
 
-        // Check if the query parameters are non-empty strings before parsing
-        const parsedRooms =
-          typeof rawRooms === "string" && rawRooms.trim() !== ""
-            ? JSON.parse(rawRooms)
-            : [];
-        const parsedServices =
-          typeof rawServices === "string" && rawServices.trim() !== ""
-            ? JSON.parse(rawServices)
-            : {};
+      // Get and parse services
+      const rawServices = searchParams.get('services');
+      console.log("Raw services:", rawServices);
+      const parsedServices = rawServices ? JSON.parse(rawServices) : {};
+      console.log("Parsed services:", parsedServices);
+      const formattedServices = formatServices(parsedServices);
+      setServices(formattedServices);
 
-        console.log("Parsed Rooms:", parsedRooms);
-        console.log("Parsed Services:", parsedServices);
-        setName(rawData.name); // Set the name here
-        setAddress(rawData.address); // Set the address here
-        setGender(rawData.gender);
-        setDescription(rawData.description);
-        setTimings(rawData.timings);
-        setLongitude(rawData.longitude);
-        setLatitude(rawData.latitude);
-        setPictures(rawData.pictures);
-        // setOwnerName(rawData.ownerDetails.name);
-        // setOwnerPhone(rawData.ownerDetails.phone);
-        // setOwnerEmail(rawData.ownerDetails.email);
-        // setProfession(rawData.ownerDetails.profession);
-        setRooms(parsedRooms);
-        // setServices(parsedServices);
-        const formattedServices = formatServices(parsedServices);
-        setServices(formattedServices);
-      } catch (error) {
-        console.error("Error parsing query parameters:", error);
+      // Set other form fields
+      setName(searchParams.get('name') || '');
+      setAddress(searchParams.get('address') || '');
+      setGender(searchParams.get('gender') || '');
+      setDescription(searchParams.get('description') || '');
+      setTimings(searchParams.get('timings') || '');
+      setLongitude(searchParams.get('longitude') || '');
+      setLatitude(searchParams.get('latitude') || '');
+      
+      // Parse and set pictures if they exist
+      const rawPictures = searchParams.get('pictures');
+      if (rawPictures) {
+        const parsedPictures = JSON.parse(rawPictures);
+        setPictures(parsedPictures);
       }
+
+      // Update formData with the new values
+      setFormData(prev => ({
+        ...prev,
+        name: searchParams.get('name') || '',
+        address: searchParams.get('address') || '',
+        profession: searchParams.get('profession') || ''
+      }));
+
+    } catch (error) {
+      console.error("Error parsing search parameters:", error, {
+        stack: error.stack
+      });
     }
-  }, [router.isReady]);
+  }, [searchParams]);
 
   function formatServices(parsedServices) {
     return {
-      fooding: parsedServices.fooding || false, // default to false if not provided
-      foodingType: parsedServices.foodingType || "veg", // default to "veg" if not provided
-      ac: parsedServices.ac || false, // default to false if not provided
-      cctv: parsedServices.cctv || false, // default to false if not provided
-      wifi: parsedServices.wifi || false, // default to false if not provided
-      laundry: parsedServices.laundry || false, // default to false if not provided
-      parking: parsedServices.parking || false, // default to false if not provided
-      security: parsedServices.security || false, // default to false if not provided
-      otherServices: parsedServices.otherServices || [], // default to empty array if not provided
+      fooding: parsedServices.fooding || false,
+      foodingType: parsedServices.foodingType || "veg",
+      ac: parsedServices.ac || false,
+      cctv: parsedServices.cctv || false,
+      wifi: parsedServices.wifi || false,
+      laundry: parsedServices.laundry || false,
+      parking: parsedServices.parking || false,
+      security: parsedServices.security || false,
+      otherServices: parsedServices.otherServices || [],
     };
   }
 
@@ -95,17 +108,14 @@ const OwnerDetailsForm = () => {
     const newErrors = {};
 
     if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.phone || !/\d{10}/.test(formData.phone)) {
+    if (!formData.phone || !/^\d{10}$/.test(formData.phone)) {
       newErrors.phone = "Phone must be a valid 10-digit number";
     }
-    if (
-      !formData.email ||
-      !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)
-    ) {
+    if (!formData.email || !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formData.email)) {
       newErrors.email = "Email must be a valid email address";
     }
     if (!formData.profession) newErrors.profession = "Profession is required";
-    if (!formData.address) newErrors.address = "Address is required"; // Validate address
+    if (!formData.address) newErrors.address = "Address is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -113,70 +123,95 @@ const OwnerDetailsForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    // If the input field is for address or rating, update accordingly
+    // Update corresponding state variables
     if (name === "address") setAddress(value);
     if (name === "rating") setRating(value);
   };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    setFormData((prev) => ({ ...prev, pictures: files }));
+    setFormData(prev => ({ ...prev, pictures: files }));
 
-    const previews = files.map((file) => URL.createObjectURL(file));
+    // Create and set image previews
+    const previews = files.map(file => URL.createObjectURL(file));
     setImagePreviews(previews);
+
+    // Clean up old previews
+    return () => {
+      imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
+    };
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Form submission started");
+
+    if (!validateForm()) {
+      console.log("Form validation failed", errors);
+      return;
+    }
+
+    // Update owner details
     setOwnerName(formData.name);
     setOwnerPhone(formData.phone);
     setOwnerEmail(formData.email);
     setProfession(formData.profession);
-    // Ensure the form is valid before submitting
-    if (validateForm()) {
-      // Prepare the data to match the schema
-      const data = {
-        name,
-        address, // Use address here
-        gender,
-        rooms,
-        services,
-        description,
-        rating, // Use rating here
-        location: {
-          longitude,
-          latitude,
-        },
-        timings,
-        pictures,
-        ownerDetails: {
-          name: ownerName,
-          phone: ownerPhone,
-          email: ownerEmail,
-        },
-        profession,
-      };
 
-      console.log("Data to be submitted to the backend:", data);
+    // Prepare submission data
+    const submissionData = {
+      name,
+      address,
+      gender,
+      rooms,
+      services,
+      description,
+      rating,
+      location: {
+        longitude,
+        latitude,
+      },
+      timings,
+      pictures,
+      ownerDetails: {
+        name: formData.name,         // Use formData directly
+        phone: formData.phone,       // Use formData directly
+        email: formData.email,       // Use formData directly
+        address: formData.ownerAddress, // Use correct property name
+      },
+      profession: formData.profession,
+    };
 
-      // Optionally send the data to the backend
-      fetch("http://localhost:5000/api/pg/create", {
+    console.log("Data to be submitted:", submissionData);
+
+    try {
+      // Uncomment and modify this section when ready to submit to backend
+      /*
+      const response = await fetch("your-api-endpoint", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
-      })
-        .then((response) => response.json())
-        .then((result) => console.log("PG listing created:", result))
-        .catch((error) => console.error("Error:", error));
+        body: JSON.stringify(submissionData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Submission successful:", result);
+      */
+    } catch (error) {
+      console.error("Submission error:", error);
+      // Handle error appropriately (e.g., show error message to user)
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4">
@@ -269,7 +304,7 @@ const OwnerDetailsForm = () => {
             <input
               type="text"
               name="address"
-              value={formData.address}
+              value={formData.ownerAddress}
               onChange={handleChange}
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
               placeholder="Enter the address"

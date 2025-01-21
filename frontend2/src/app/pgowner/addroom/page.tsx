@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 interface Features {
@@ -46,6 +46,7 @@ const AddRoom: React.FC = () => {
       pictures: [],
     },
   ]);
+
   const [services, setServices] = useState<Services>({
     fooding: false,
     foodingType: "",
@@ -57,10 +58,19 @@ const AddRoom: React.FC = () => {
     security: false,
     otherServices: [],
   });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
-  // console.log(router);
-  const prevformData = useSearchParams();
+  const searchParams = useSearchParams();
+
+  // Function to get all current search parameters as an object
+  const getAllSearchParams = () => {
+    const params: Record<string, string> = {};
+    searchParams.forEach((value, key) => {
+      params[key] = value;
+    });
+    return params;
+  };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -79,7 +89,7 @@ const AddRoom: React.FC = () => {
   const handleRoomChange = (
     index: number,
     field: string,
-    value: string | boolean | string[]
+    value: string | boolean | string[],
   ) => {
     setRooms((prev) => {
       const updatedRooms = [...prev];
@@ -102,27 +112,33 @@ const AddRoom: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (validateForm()) {
-      // Prepare serialized data
-      const serializedData = {
-        rooms: JSON.stringify(rooms), // Serialize rooms
-        services: JSON.stringify(services), // Serialize services
+      // Get all current search parameters
+      const currentParams = getAllSearchParams();
+
+      // Prepare new data
+      const newData = {
+        ...currentParams, // Include all current parameters
+        rooms: JSON.stringify(rooms),
+        services: JSON.stringify(services),
       };
 
-      console.log("Serialized Data being passed:", serializedData);
+      // Log the complete data being passed
+      console.log("Complete data being passed:", newData);
 
-      // Construct URL-safe query parameters
-      const queryData = new URLSearchParams({
-        ...prevformData, // Include previous form data
-        ...serializedData, // Add serialized rooms and services
-      }).toString();
+      // Construct query string with all parameters
+      const queryString = new URLSearchParams(newData).toString();
+      console.log("Final query string:", queryString);
 
-      console.log(JSON.stringify(queryData));
-      // Navigate to the new page
-      router.push(`/pgowner/addOwnerDetails?${queryData}`);
+      // Navigate to the next page with all parameters
+      router.push(`/pgowner/addOwnerDetails?${queryString}`);
     }
   };
+
+  // Debug logging
+  useEffect(() => {
+    console.log("Current search parameters:", getAllSearchParams());
+  }, [searchParams]);
 
   const addRoom = () => {
     setRooms((prev) => [
@@ -215,7 +231,7 @@ const AddRoom: React.FC = () => {
                         handleRoomChange(
                           index,
                           "features.furnished",
-                          e.target.checked
+                          e.target.checked,
                         )
                       }
                       className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
@@ -256,7 +272,7 @@ const AddRoom: React.FC = () => {
                       handleRoomChange(
                         index,
                         "pictures",
-                        Array.from(e.target.files).map((file) => file.name)
+                        Array.from(e.target.files).map((file) => file.name),
                       )
                     }
                     className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-colors"
@@ -329,7 +345,7 @@ const AddRoom: React.FC = () => {
                     />
                     <span className="text-gray-700 capitalize">{service}</span>
                   </label>
-                )
+                ),
               )}
 
               <label className="block text-gray-700 font-medium mb-1">
@@ -340,7 +356,7 @@ const AddRoom: React.FC = () => {
                 onChange={(e) =>
                   handleServicesChange(
                     "otherServices",
-                    e.target.value.split(",").map((s) => s.trim())
+                    e.target.value.split(",").map((s) => s.trim()),
                   )
                 }
                 className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
