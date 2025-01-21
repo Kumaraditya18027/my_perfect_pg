@@ -176,7 +176,7 @@ const OwnerDetailsForm = () => {
         latitude,
       },
       timings,
-      pictures,
+      pictures: formData.pictures,
       ownerDetails: {
         name: formData.name,         // Use formData directly
         phone: formData.phone,       // Use formData directly
