@@ -21,6 +21,7 @@ const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
+    console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
     try {
       setLoading(true);
       const response = await fetch(
@@ -31,7 +32,7 @@ const RegisterPage: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
-        }
+        },
       );
 
       if (!response.ok) {
