@@ -42,22 +42,15 @@ const CloseIcon = () => (
 );
 
 const Navbar = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(
     localStorage.getItem("isLoggedIn")
   );
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
-  // const logout = () => {
-  //   setIsLoggedIn((prev) => !prev);
-  //   localStorage.setItem("isLoggedIn", false);
-  //   router.push("/");
-  // };
-
   const handleLogout = async () => {
-    // e.preventDefault();
-
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-logout`,
@@ -110,7 +103,7 @@ const Navbar = () => {
             <NavLink href="/searchpg">Search</NavLink>
             <NavLink href="/nearbypg">Nearby PGs</NavLink>
             {/* <NavLink href="/Summary">Dashboard</NavLink> */}
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <button
                 onClick={logout}
                 className="px-4 py-2 rounded-full bg-blue-500 text-white font-medium 
@@ -167,16 +160,29 @@ const Navbar = () => {
             {/* <MobileNavLink href="/about" onClick={() => setIsOpen(false)}>
               About
             </MobileNavLink> */}
-            <button
-              onClick={handleLogout}
-              className="block w-full text-center px-4 py-2 mt-4 rounded-full 
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="block w-full text-center px-4 py-2 mt-4 rounded-full 
                          bg-blue-500 text-white font-medium 
                          transform transition-all duration-300 
                          hover:bg-blue-600 hover:scale-105
                          active:scale-95"
-            >
-              Logout
-            </button>
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push("/login")}
+                className="block w-full text-center px-4 py-2 mt-4 rounded-full 
+                         bg-blue-500 text-white font-medium 
+                         transform transition-all duration-300 
+                         hover:bg-blue-600 hover:scale-105
+                         active:scale-95"
+              >
+                Login
+              </button>
+            )}
           </div>
         </div>
       </div>

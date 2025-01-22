@@ -1,8 +1,10 @@
 "use client";
+import { useAuth } from "@/app/contexts/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
 
 function HomeNavbar() {
+  const { isAuthenticated } = useAuth();
   return (
     <nav className="relative z-10 flex justify-between items-center p-4 md:p-6">
       <Link href="/" className="text-white text-2xl font-semibold">
@@ -21,12 +23,14 @@ function HomeNavbar() {
         >
           About
         </Link>
-        <Link
-          href="/login"
-          className="text-white hover:text-gray-200 transition"
-        >
-          Login
-        </Link>
+        {!isAuthenticated && (
+          <Link
+            href="/login"
+            className="text-white hover:text-gray-200 transition"
+          >
+            Login
+          </Link>
+        )}
       </div>
     </nav>
   );

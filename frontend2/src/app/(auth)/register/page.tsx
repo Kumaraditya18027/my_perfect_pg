@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import HomeNavbar from "@/components/HomeNavbar";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 interface FormData {
   name: string;
@@ -12,6 +13,7 @@ interface FormData {
 
 const RegisterPage: React.FC = () => {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -19,6 +21,14 @@ const RegisterPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  //check authentication state and redirect to page accordingly
+  useEffect(() => {
+    console.log("Is authenticated", isAuthenticated);
+    if (isAuthenticated) {
+      router.replace("/searchpg");
+    }
+  }, [isAuthenticated, router]);
 
   const handleRegister = async () => {
     console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
@@ -32,7 +42,7 @@ const RegisterPage: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
-        },
+        }
       );
 
       if (!response.ok) {

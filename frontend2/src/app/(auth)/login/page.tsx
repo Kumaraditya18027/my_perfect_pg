@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import Loading from "@/components/Loading";
 
 interface FormData {
   email: string;
@@ -22,11 +23,17 @@ const LoginPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
 
+  //check authentication state and redirect to page accordingly
   useEffect(() => {
+    console.log("Is authenticated", isAuthenticated);
     if (isAuthenticated) {
       router.replace("/searchpg");
     }
   }, [isAuthenticated, router]);
+
+  if (isAuthenticated) {
+    return <Loading />;
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
