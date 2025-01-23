@@ -35,6 +35,13 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "customer", "pgowner", "employee"],
       default: "customer",
     },
+    bio: { type: String },
+    bookmarkedPg: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Pg",
+      },
+    ],
     refreshToken: { type: String },
   },
   { timestamps: true }
