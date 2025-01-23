@@ -15,7 +15,7 @@ router.route("/user-login").post(loginUser);
 router.route("/user-logout").post(authHandler(), logoutUser);
 
 //get all pgs
-router.route("/user/get-all-pgs").post(getAllPgs);
+router.route("/user/get-all-pgs").get(getAllPgs);
 
 //pg bookings
 router.route("/user/create-booking").post(authHandler(), createBooking);
