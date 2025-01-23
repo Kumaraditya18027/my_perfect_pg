@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  // loggedInUserType: string;
+  currentUserData: object | null;
   login: (token: string, userType: string) => void;
   logout: () => void;
 }
@@ -17,16 +19,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [currentUserData, setCurrentUserData] = useState<object>({});
+  // const [loggedInUserType, setLoggedInUserType] = useState<string>("Student");
 
-  const login = (token: string, userType: string) => {
+  const login = (token: string, userType: string, userData: object) => {
     if (token && userType) {
       localStorage.setItem("authToken", token);
       localStorage.setItem("isLoggedIn", true);
+      localStorage.setItem("loggedInUserType", userType);
+      // setLoggedInUserType(userType);
       setIsAuthenticated(true);
+      setCurrentUserData(userData);
 
       if (userType === "Admin") {
         console.log("Going to admin page...");
-        router.push("/admin");
+        router.push("/admin/summary");
         return;
       } else if (userType === "Owner") {
         console.log("Going to owner page...");
@@ -43,12 +50,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = () => {
     localStorage.removeItem("authToken");
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("loggedInUserType");
     setIsAuthenticated(false);
     router.push("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, currentUserData, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
