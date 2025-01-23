@@ -101,7 +101,7 @@ const Navbar = () => {
             <NavLink href="/about">About Us</NavLink>
             <NavLink href="/searchpg">Search</NavLink>
             <NavLink href="/nearbypg">Nearby PGs</NavLink>
-            {/* <NavLink href="/Summary">Dashboard</NavLink> */}
+            <NavLink href="/profile">Profile</NavLink>
             {localStorage.getItem("isLoggedIn") ? (
               <button
                 onClick={logout}

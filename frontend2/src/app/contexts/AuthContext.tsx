@@ -19,7 +19,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const router = useRouter();
-  // const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [currentUserData, setCurrentUserData] = useState<object>({});
 
   const login = (token: string, userType: string, userData: object) => {
@@ -27,6 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.setItem("authToken", encryptToken(token));
       localStorage.setItem("isLoggedIn", true);
       localStorage.setItem("loggedInUserType", userType);
+      console.log("User data : ", userData);
       setCurrentUserData(userData);
 
       if (userType === "Admin") {
@@ -52,8 +52,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     router.push("/login");
   };
 
+  const editUserData = (userData: object) => {
+    setCurrentUserData(userData);
+  };
+
   return (
-    <AuthContext.Provider value={{ currentUserData, login, logout }}>
+    <AuthContext.Provider
+      value={{ currentUserData, login, logout, editUserData }}
+    >
       {children}
     </AuthContext.Provider>
   );
