@@ -12,13 +12,12 @@ const editProfile = asyncHandler(async (req, res) => {
   const { name, email, phone, bio } = req.body;
   const userId = req.user._id;
 
+  console.log(userId);
   if (!userId) {
     throw new ValidationError("User ID required!");
   }
 
-  const user = await User.findById(userId).select(
-    "-_id -refreshToken -password"
-  );
+  const user = await User.findById(userId).select("-refreshToken -password");
 
   if (!user) {
     throw new NotFoundError("User not found!");
