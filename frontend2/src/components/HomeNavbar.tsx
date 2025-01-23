@@ -1,8 +1,15 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 function HomeNavbar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+    setIsLoggedIn(loggedIn);
+  }, []);
   return (
     <nav className="relative z-10 flex justify-between items-center p-4 md:p-6">
       <Link href="/" className="text-white text-2xl font-semibold">
@@ -21,7 +28,7 @@ function HomeNavbar() {
         >
           About
         </Link>
-        {!localStorage.getItem("isLoggedIn") && (
+        {!isLoggedIn && (
           <Link
             href="/login"
             className="text-white hover:text-gray-200 transition"
