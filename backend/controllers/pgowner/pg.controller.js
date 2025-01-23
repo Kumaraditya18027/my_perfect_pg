@@ -12,8 +12,10 @@ const addPg = asyncHandler(async (req, res) => {
     gender,
     rooms,
     services,
+    rating,
     description,
-    location,
+    latitude,
+    longitude,
     timings,
     profession,
   } = req.body;
@@ -25,10 +27,9 @@ const addPg = asyncHandler(async (req, res) => {
     !name ||
     !address ||
     !gender ||
-    !rooms ||
-    !services ||
     !description ||
-    !location ||
+    !latitude ||
+    !longitude ||
     !timings ||
     !owner ||
     !profession
@@ -37,7 +38,7 @@ const addPg = asyncHandler(async (req, res) => {
   }
 
   // multiple files for pictures
-  const pictureFiles = req.files;
+  const pictureFiles = req.files || null;
 
   if (!pictureFiles || pictureFiles.length === 0) {
     throw new ApiError(400, "At least one picture must be uploaded!");
@@ -53,17 +54,24 @@ const addPg = asyncHandler(async (req, res) => {
     }
   }
 
+  const parsedServices = JSON.parse(services);
+  const parsedRooms = JSON.parse(rooms);
+
   // Create a new PG document with the uploaded picture URLs
   const pg = new Pg({
     name,
     address,
     gender,
-    rooms,
-    services,
+    rooms: parsedRooms || [],
+    services: parsedServices || {},
+    rating: rating || 0,
     description,
-    location,
-    timings,
+    location: {
+      latitude,
+      longitude,
+    },
     pictures: pictureUrls,
+    timings,
     owner,
     profession,
   });
@@ -75,6 +83,8 @@ const addPg = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ResponseHandler(201, "PG added successfully!", pg));
 });
+
+const addPgImages = asyncHandler(async (req, res) => {});
 
 //edit pg
 const editPg = asyncHandler(async (req, res) => {
