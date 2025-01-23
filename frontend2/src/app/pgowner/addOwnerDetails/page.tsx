@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const OwnerDetailsForm = () => {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [gender, setGender] = useState("");
@@ -17,7 +18,7 @@ const OwnerDetailsForm = () => {
   const [ownerPhone, setOwnerPhone] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
   const [profession, setProfession] = useState("");
-  const [rating, setRating] = useState("");
+  const [rating, setRating] = useState(0);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -149,6 +150,81 @@ const OwnerDetailsForm = () => {
     };
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Form submission started");
+
+    if (!validateForm()) {
+      console.log("Form validation failed", errors);
+      return;
+    }
+
+    // Update owner details
+    setOwnerName(formData.name);
+    setOwnerPhone(formData.phone);
+    setOwnerEmail(formData.email);
+    setProfession(formData.profession);
+
+    console.log(formData);
+
+    // Create a FormData object
+    const formDataToSend = new FormData();
+
+    // Append fields to FormData
+    formDataToSend.append("name", name);
+    formDataToSend.append("address", address);
+    formDataToSend.append("gender", gender);
+    formDataToSend.append("rooms", JSON.stringify(rooms));
+    formDataToSend.append("services", JSON.stringify(services)); // Serialize arrays or objects
+    formDataToSend.append("description", description);
+    formDataToSend.append("rating", rating);
+    formDataToSend.append("longitude", longitude);
+    formDataToSend.append("latitude", latitude);
+    formDataToSend.append("timings", timings);
+
+    // Append pictures if available
+    if (formData.pictures && formData.pictures.length > 0) {
+      formData.pictures.forEach((picture, index) => {
+        formDataToSend.append(`pictureFiles`, picture); // Files go directly
+      });
+    }
+
+    // Append owner details
+    // formDataToSend.append("ownerDetails[name]", formData.name);
+    // formDataToSend.append("ownerDetails[phone]", formData.phone);
+    // formDataToSend.append("ownerDetails[email]", formData.email);
+    // formDataToSend.append("ownerDetails[address]", formData.address);
+    formDataToSend.append("profession", formData.profession);
+
+    console.log("Data to be submitted:", Array.from(formDataToSend.entries())); // Debugging
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/pgowner/add-pg`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Do not set "Content-Type" with FormData
+          },
+          body: formDataToSend,
+        }
+      );
+
+      console.log(response);
+
+      if (!response.ok) {
+        console.log(response);
+        throw new Error("Submission failed. Please check your data.");
+      }
+
+      const data = await response.json();
+      console.log(data);
+    } catch (error: any) {
+      console.error("Submission error:", error);
+      setErrors(error.message || "Something went wrong. Please try again.");
+    }
+  };
+
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
   //   console.log("Form submission started");
@@ -173,18 +249,16 @@ const OwnerDetailsForm = () => {
   //     services,
   //     description,
   //     rating,
-  //     location: {
-  //       longitude,
-  //       latitude,
-  //     },
+  //     longitude,
+  //     latitude,
   //     timings,
-  //     pictures: formData.pictures,
-  //     ownerDetails: {
-  //       name: formData.name, // Use formData directly
-  //       phone: formData.phone, // Use formData directly
-  //       email: formData.email, // Use formData directly
-  //       address: formData.ownerAddress, // Use correct property name
-  //     },
+  //     // pictures: formData.pictures,
+  //     // ownerDetails: {
+  //     //   name: formData.name, // Use formData directly
+  //     //   phone: formData.phone, // Use formData directly
+  //     //   email: formData.email, // Use formData directly
+  //     //   address: formData.address, // Use correct property name
+  //     // },
   //     profession: formData.profession,
   //   };
 
@@ -192,7 +266,7 @@ const OwnerDetailsForm = () => {
 
   //   try {
   //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/pgowner/add-pg`,
+  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/pgowner/add-pg`,
   //       {
   //         method: "POST",
   //         headers: {
@@ -202,6 +276,8 @@ const OwnerDetailsForm = () => {
   //         body: JSON.stringify(submissionData),
   //       }
   //     );
+
+  //     console.log(response);
 
   //     if (!response.ok) {
   //       throw new Error("Submission failed. Please check your data.");
@@ -214,70 +290,6 @@ const OwnerDetailsForm = () => {
   //     setErrors(error.message || "Something went wrong. Please try again.");
   //   }
   // };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("Form submission started");
-
-    if (!validateForm()) {
-      console.log("Form validation failed", errors);
-      return;
-    }
-
-    // Create a FormData object
-    const submissionData = new FormData();
-    submissionData.append("name", formData.name);
-    submissionData.append("address", formData.address);
-    submissionData.append("gender", gender);
-    submissionData.append("rooms", JSON.stringify(rooms));
-    submissionData.append("services", JSON.stringify(services));
-    submissionData.append("description", description);
-    submissionData.append("rating", rating);
-    submissionData.append(
-      "location",
-      JSON.stringify({
-        longitude: longitude,
-        latitude: latitude,
-      })
-    );
-    submissionData.append("timings", JSON.stringify(timings));
-    submissionData.append("profession", formData.profession);
-
-    // Add pictures
-    if (formData.pictures && formData.pictures.length > 0) {
-      formData.pictures.forEach((picture) => {
-        submissionData.append("pictureFiles", picture);
-      });
-    }
-
-    console.log("Data to be submitted via FormData");
-    for (const [key, value] of submissionData.entries()) {
-      console.log(`${key}:`, value);
-    }
-
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/pgowner/add-pg`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-          body: submissionData,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Submission failed. Please check your data.");
-      }
-
-      const data = await response.json();
-      console.log("Success:", data);
-    } catch (error) {
-      console.error("Submission error:", error);
-      setErrors(error.message || "Something went wrong. Please try again.");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4">
