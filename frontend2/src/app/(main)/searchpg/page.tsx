@@ -1,8 +1,23 @@
 // import Navbar from "@/components/Navbar2";
 "use client";
 import Image from "next/image";
-import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo, useState } from "react";
+
+interface PgOverviewDetails {
+  id: string;
+  name: string;
+  address: string;
+  gender: string;
+  price: number;
+  amenities: string[];
+  roomTypes: string[];
+  rating: number;
+  timings: string;
+  latitude: number;
+  longitude: number;
+  images: string[];
+}
 
 const SearchIcon = () => (
   <svg
@@ -39,6 +54,7 @@ const LocationIcon = () => (
 );
 
 const PGShowcase = () => {
+  const router = useRouter();
   const [selectedFilters, setSelectedFilters] = useState({
     priceRange: "all",
     roomType: "all",
@@ -46,6 +62,10 @@ const PGShowcase = () => {
   });
   const [searchPg, setSearchPg] = useState("");
   const [sortPg, setSortPg] = useState("recommended");
+
+  const [pg, setPg] = useState<Array<PgOverviewDetails | null>>([null]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const pgs = [
     {
@@ -154,6 +174,69 @@ const PGShowcase = () => {
     },
   ];
 
+  //Fetch pgs from databse
+  useEffect(() => {
+    const fetchPgs = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/customer/get-all-pgs`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch PG details.");
+        }
+
+        // console.log(response.json());
+        const data = await response.json();
+        console.log(data);
+
+        //format pg data
+        const pgData = data?.data?.map((pg) => {
+          const roomTypes = pg.rooms?.map((room) => room.type);
+
+          // Generate amenities based on services with true values
+          const amenities = [];
+          Object.keys(pg.services).forEach((key) => {
+            if (pg.services[key] === true) {
+              amenities.push(key);
+            }
+          });
+
+          return {
+            id: pg.uuid,
+            name: pg.name,
+            address: pg.address,
+            gender: pg.gender,
+            price: pg.rooms[0]?.rates.monthly || 1000, // Adjusted to get the monthly rate from the first room
+            amenities,
+            roomTypes,
+            rating: pg.rating, // Corrected the spelling of "ranting" to "rating"
+            timings: pg.timings, // Assuming "timings" is correct
+            latitude: pg.location.latitude,
+            longitude: pg.location.longitude,
+            images: pg.pictures, // Adjusted the key to "images" from "pictures"
+          };
+        });
+
+        setPg(pgData);
+        setLoading(false);
+      } catch (err: any) {
+        console.error(err);
+        setError("Failed to fetch PG details. Please try again later.");
+        setLoading(false);
+      }
+    };
+
+    fetchPgs();
+  }, []);
+
   const filters = {
     priceRanges: [
       { label: "All Prices", value: "all" },
@@ -175,30 +258,30 @@ const PGShowcase = () => {
   };
 
   const filteredPg = useMemo(() => {
-    return pgs.filter((pg) => {
+    return pg?.filter((pg) => {
       const searchLower = searchPg.toLowerCase();
       const priceCondition =
         selectedFilters.priceRange === "all" ||
-        (selectedFilters.priceRange === "under5k" && pg.price < 5000) ||
+        (selectedFilters.priceRange === "under5k" && pg?.price < 5000) ||
         (selectedFilters.priceRange === "5k-10k" &&
-          pg.price >= 5000 &&
-          pg.price <= 10000) ||
-        (selectedFilters.priceRange === "above10k" && pg.price > 10000);
+          pg?.price >= 5000 &&
+          pg?.price <= 10000) ||
+        (selectedFilters.priceRange === "above10k" && pg?.price > 10000);
 
       const roomCondition =
         selectedFilters.roomType === "all" ||
-        pg.roomTypes.some(
+        pg?.roomTypes.some(
           (room) => room.toLowerCase() === selectedFilters.roomType
         );
 
       const genderCondition =
         selectedFilters.gender === "all" ||
-        pg.gender.toLowerCase() === selectedFilters.gender;
+        pg?.gender.toLowerCase() === selectedFilters.gender;
 
       return (
-        (pg.name.toLowerCase().includes(searchLower) ||
-          pg.location.toLowerCase().includes(searchLower) ||
-          pg.amenities.some((amenity) =>
+        (pg?.name.toLowerCase().includes(searchLower) ||
+          pg?.address.toLowerCase().includes(searchLower) ||
+          pg?.amenities.some((amenity) =>
             amenity.toLowerCase().includes(searchLower)
           )) &&
         priceCondition &&
@@ -206,7 +289,7 @@ const PGShowcase = () => {
         genderCondition
       );
     });
-  }, [pgs, searchPg, selectedFilters]);
+  }, [pg, searchPg, selectedFilters]);
 
   const sortedPg = useMemo(() => {
     const sorted = [...filteredPg];
@@ -219,6 +302,18 @@ const PGShowcase = () => {
     }
     return sorted;
   }, [filteredPg, sortPg]);
+
+  if (loading) {
+    return <div className="text-center mt-8">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center mt-8 text-red-500">{error}</div>;
+  }
+
+  if (!pg) {
+    return <div className="text-center mt-8">No PG listed currently.</div>;
+  }
 
   return (
     <>
@@ -351,7 +446,7 @@ const PGShowcase = () => {
 
                 <div className="flex items-center text-gray-600 mb-4">
                   <LocationIcon />
-                  <span className="ml-2">{pg.location}</span>
+                  <span className="ml-2">{pg?.address}</span>
                 </div>
 
                 <div className="mb-4">
@@ -374,12 +469,12 @@ const PGShowcase = () => {
                     </span>
                     <span className="text-gray-600 text-sm">/month</span>
                   </div>
-                  <Link
-                    href="/#app"
+                  <button
+                    onClick={() => router.push(`/searchpg/${pg?.id}`)}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition-colors"
                   >
                     View Details
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
