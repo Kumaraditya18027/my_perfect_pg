@@ -1,11 +1,9 @@
 "use client";
 
 import HomeNavbar from "@/components/HomeNavbar";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/app/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import Loading from "@/components/Loading";
 
 interface FormData {
   email: string;
@@ -14,8 +12,7 @@ interface FormData {
 }
 
 const LoginPage: React.FC = () => {
-  const router = useRouter();
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -46,7 +43,7 @@ const LoginPage: React.FC = () => {
 
       const data = await response.json();
       console.log(data);
-      login(data.data.accessToken, formData.userType, data.data.user); // Call login method from AuthContext with token
+      login(data.data.accessToken, formData.userType, data.data.user);
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
     }

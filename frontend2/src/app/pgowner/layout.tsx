@@ -1,46 +1,32 @@
 // app/pgowner/layout.tsx
 "use client";
 
-import ProtectedRoute from "@/components/ProtectedRoute";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import React from "react";
 import { useAuth } from "../contexts/AuthContext";
-import Loading from "@/components/Loading";
 import { toast, ToastContainer } from "react-toastify";
-
-const userType = "Owner";
+import { decryptToken } from "@/utils/secureToken";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const PgOwnerLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
-  const { isAuthenticated, logout } = useAuth();
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    console.log("Is authenticated", isAuthenticated);
-    console.log("Required user type", userType);
-    const loggedInUserType = localStorage.getItem("loggedInUserType");
-    console.log("Logged in user type", loggedInUserType);
-    if (!isAuthenticated && loggedInUserType !== userType) {
-      router.replace("/login"); // Redirect unauthenticated users to the login page
-    }
-  }, [isAuthenticated, router]);
-
-  if (!isAuthenticated) {
-    return <Loading />; // Show loading while redirecting
-  }
+  console.log(pathname);
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     try {
+      const token = decryptToken(localStorage.getItem("authToken"));
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-logout`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
         }
       );
 
@@ -49,7 +35,6 @@ const PgOwnerLayout = ({ children }: { children: React.ReactNode }) => {
       }
 
       await response.json();
-      // console.log(data);
       logout();
     } catch (err: any) {
       console.log(err.message || "Something went wrong. Please try again.");
@@ -73,7 +58,7 @@ const PgOwnerLayout = ({ children }: { children: React.ReactNode }) => {
   ];
 
   return (
-    <div>
+    <ProtectedRoute userType="Owner">
       {/* Navbar */}
       <nav className="bg-gray-800 text-white py-4 px-6">
         <ul className="flex gap-6">
@@ -103,7 +88,7 @@ const PgOwnerLayout = ({ children }: { children: React.ReactNode }) => {
         <ToastContainer />
         {children}
       </main>
-    </div>
+    </ProtectedRoute>
   );
 };
 

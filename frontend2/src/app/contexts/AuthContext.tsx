@@ -3,6 +3,7 @@
 
 import React, { createContext, useContext, useState } from "react";
 import { useRouter } from "next/navigation";
+import { encryptToken } from "@/utils/secureToken";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -18,17 +19,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  // const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [currentUserData, setCurrentUserData] = useState<object>({});
-  // const [loggedInUserType, setLoggedInUserType] = useState<string>("Student");
 
   const login = (token: string, userType: string, userData: object) => {
     if (token && userType) {
-      localStorage.setItem("authToken", token);
+      localStorage.setItem("authToken", encryptToken(token));
       localStorage.setItem("isLoggedIn", true);
       localStorage.setItem("loggedInUserType", userType);
-      // setLoggedInUserType(userType);
-      setIsAuthenticated(true);
       setCurrentUserData(userData);
 
       if (userType === "Admin") {
@@ -51,14 +49,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem("authToken");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("loggedInUserType");
-    setIsAuthenticated(false);
     router.push("/login");
   };
 
   return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, currentUserData, login, logout }}
-    >
+    <AuthContext.Provider value={{ currentUserData, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

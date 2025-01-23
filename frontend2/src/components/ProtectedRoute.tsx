@@ -1,20 +1,34 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/contexts/AuthContext";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import Loading from "./Loading";
 
-const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+const ProtectedRoute = ({
+  children,
+  userType,
+}: {
+  children: ReactNode;
+  userType: string;
+}) => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    console.log("Is authenticated", isLoggedIn);
+    console.log("Required user type", userType);
+    const loggedInUserType = localStorage.getItem("loggedInUserType");
+    console.log("Logged in user type", loggedInUserType);
+    if (!isLoggedIn || loggedInUserType !== userType) {
       router.replace("/login"); // Redirect unauthenticated users to the login page
+      return;
+    } else {
+      setIsLoading(false); // Allow rendering once authenticated and user type matches
     }
-  }, [isAuthenticated, router]);
+  }, [isLoggedIn, router, userType]);
 
-  if (!isAuthenticated) {
-    return null; // Show nothing while redirecting
+  if (isLoading) {
+    return <Loading />; // Show nothing while redirecting
   }
 
   return <>{children}</>;

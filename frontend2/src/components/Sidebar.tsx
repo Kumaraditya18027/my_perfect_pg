@@ -1,5 +1,6 @@
 "use client";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { decryptToken } from "@/utils/secureToken";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { FaChartBar, FaBox, FaCog, FaSignOutAlt } from "react-icons/fa";
@@ -12,13 +13,15 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     try {
+      const token = decryptToken(localStorage.getItem("authToken"));
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-logout`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -28,7 +31,6 @@ const Sidebar = () => {
       }
 
       await response.json();
-      // console.log(data);
       logout();
     } catch (err: any) {
       console.log(err.message || "Something went wrong. Please try again.");

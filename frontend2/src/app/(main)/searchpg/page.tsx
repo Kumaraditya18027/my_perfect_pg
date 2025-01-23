@@ -1,5 +1,6 @@
 // import Navbar from "@/components/Navbar2";
 "use client";
+import { decryptToken } from "@/utils/secureToken";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
@@ -178,13 +179,15 @@ const PGShowcase = () => {
   useEffect(() => {
     const fetchPgs = async () => {
       try {
+        const token = decryptToken(localStorage.getItem("authToken"));
+
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/customer/get-all-pgs`,
           {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );

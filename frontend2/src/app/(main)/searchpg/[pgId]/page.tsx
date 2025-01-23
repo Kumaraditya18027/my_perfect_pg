@@ -1,4 +1,5 @@
 "use client";
+import { decryptToken } from "@/utils/secureToken";
 import React, { useEffect, useState } from "react";
 import { FaMapMarkerAlt, FaWifi, FaParking, FaStar } from "react-icons/fa";
 import { LuCctv } from "react-icons/lu";
@@ -57,13 +58,15 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
       // Fetch the PG details from the backend using Fetch API
       const fetchPgDetails = async () => {
         try {
+          const token = decryptToken(localStorage.getItem("authToken"));
+
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/customer/get-pg-details/${pgId}`,
             {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                Authorization: `Bearer ${token}`,
               },
             }
           );
