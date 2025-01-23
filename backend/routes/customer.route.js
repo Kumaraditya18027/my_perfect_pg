@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authHandler = require("../middlewares/authHandler.js");
+const upload = require("../utils/uploader.js");
 const { logoutUser } = require("../controllers/user/auth.controller");
 const {
   getAllPgs,
