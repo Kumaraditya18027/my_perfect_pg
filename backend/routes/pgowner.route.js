@@ -19,15 +19,15 @@ const {
 
 //authentication
 router.route("/user-login").post(loginUser);
-router.route("/user-logout").post(authHandler, logoutUser);
+router.route("/user-logout").post(authHandler(), logoutUser);
 
 //pg
 router
   .route("/pgowner/add-pg")
-  .post(authHandler, upload.array("pictures", 10), addPg);
-router.route("/pgowner/edit-pg").patch(authHandler, editPg);
-router.route("/pgowner/remove-pg").delete(authHandler, removePg);
-router.route("/pgowner/get-pg").get(authHandler, getPg);
+  .post(authHandler(), upload.array("pictureFiles"), addPg);
+router.route("/pgowner/edit-pg").patch(authHandler(), editPg);
+router.route("/pgowner/remove-pg").delete(authHandler(), removePg);
+router.route("/pgowner/get-pg").get(authHandler(), getPg);
 
 //pg booking
 router.route("/pgowner/get-all-bookings").post(authHandler(), getAllBookings);
