@@ -22,14 +22,6 @@ const RegisterPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  //check authentication state and redirect to page accordingly
-  useEffect(() => {
-    console.log("Is authenticated", isAuthenticated);
-    if (isAuthenticated) {
-      router.replace("/searchpg");
-    }
-  }, [isAuthenticated, router]);
-
   const handleRegister = async () => {
     console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
     try {

@@ -23,18 +23,6 @@ const LoginPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
 
-  //check authentication state and redirect to page accordingly
-  useEffect(() => {
-    console.log("Is authenticated", isAuthenticated);
-    if (isAuthenticated) {
-      router.replace("/searchpg");
-    }
-  }, [isAuthenticated, router]);
-
-  if (isAuthenticated) {
-    return <Loading />;
-  }
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -58,7 +46,7 @@ const LoginPage: React.FC = () => {
 
       const data = await response.json();
       console.log(data);
-      login(data.data.accessToken, formData.userType); // Call login method from AuthContext with token
+      login(data.data.accessToken, formData.userType, data.data.user); // Call login method from AuthContext with token
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
     }
