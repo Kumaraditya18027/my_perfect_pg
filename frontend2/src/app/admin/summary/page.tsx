@@ -14,6 +14,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useRouter } from "next/navigation";
 
 ChartJS.register(
   CategoryScale,
@@ -26,6 +27,7 @@ ChartJS.register(
 );
 
 const Page: React.FC = () => {
+  const router = useRouter();
   const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
 
   // Data for the charts (mock data for example purposes)
@@ -84,9 +86,9 @@ const Page: React.FC = () => {
   ];
 
   return (
-    <div className="flex-grow bg-white p-6">
+    <div className="flex-grow bg-white">
       <div className="flex justify-between items-center">
-        <h1 className="text-[17px] font-semibold">Hello Rajgopal</h1>
+        <h1 className="text-[17px] font-semibold">Hello Admin</h1>
         <button className="relative bg-gray-100 p-3 rounded-full hover:bg-gray-200">
           <FaBell className="w-4 h-4" />
           <span className="absolute top-0 right-0 inline-block w-3 h-3 bg-blue-500 border-2 border-white rounded-full" />
@@ -104,6 +106,13 @@ const Page: React.FC = () => {
             className="relative text-sm bg-gray-100 p-2 rounded-[14px] hover:bg-gray-200"
           >
             <p>New Booking</p>
+            <span className="absolute top-0 right-0 inline-block w-3 h-3 bg-blue-500 border-2 border-white rounded-full" />
+          </button>
+          <button
+            onClick={() => router.push("/admin/pg-requests")}
+            className="relative text-sm bg-gray-100 p-2 ml-4 rounded-[14px] hover:bg-gray-200"
+          >
+            <p>New PG Request</p>
             <span className="absolute top-0 right-0 inline-block w-3 h-3 bg-blue-500 border-2 border-white rounded-full" />
           </button>
 
