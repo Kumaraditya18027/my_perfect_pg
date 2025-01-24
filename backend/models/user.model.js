@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
     bio: { type: String },
     bookmarkedPg: [
       {
-        type: mongoose.Schema.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Pg",
       },
     ],
