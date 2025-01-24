@@ -7,7 +7,7 @@ const {
 } = require("../controllers/user/auth.controller");
 const { getAllPgs } = require("../controllers/customer/pg.controller.js");
 const authHandler = require("../middlewares/authHandler.js");
-const { createBooking } = require("../controllers/admin/pg.controller.js");
+const { createBooking } = require("../controllers/customer/pg.controller.js");
 
 //authentication
 router.route("/user-register").post(registerUser);
