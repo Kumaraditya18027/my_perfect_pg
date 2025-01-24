@@ -7,7 +7,9 @@ const User = require("../../models/user.model");
 
 //get pg verify requests
 const getPgVerifyRequests = asyncHandler(async (req, res) => {
-  const requests = await Pg.find({ isAdminVerified: false }).select("-_id");
+  const requests = await Pg.find({ isAdminVerified: false })
+    .select("-_id")
+    .populate("owner", "uuid name email phone address");
 
   if (!requests || requests.length === 0) {
     return res
@@ -80,57 +82,6 @@ const getAllPgsListed = asyncHandler(async (req, res) => {
     .json(
       new ResponseHandler(200, "All listed PGs fetched successfully!", pgs)
     );
-});
-
-//create a booking
-const createBooking = asyncHandler(async (req, res) => {
-  const { userId, pgId, roomType, foodingType, ac } = req.body;
-
-  if (!userId || !pgId || !roomType || !foodingType || ac === undefined) {
-    throw new ApiError(400, "All fields are required.");
-  }
-
-  // Check if the PG exists
-  const pg = await Pg.findOne({ uuid: pgId });
-  if (!pg) {
-    throw new ApiError(404, "PG not found.");
-  }
-
-  // Check if the user exists
-  const user = await User.findOne({ uuid: userId });
-  if (!user) {
-    throw new ApiError(404, "User not found.");
-  }
-
-  // Check room availability
-  const room = pg.rooms.find(
-    (room) => room.type === roomType && room.features.ac === ac
-  );
-
-  if (!room || room.availability.count <= room.availability.booked) {
-    throw new ApiError(400, "Room type is not available.");
-  }
-
-  // Create a new booking
-  const booking = new Booking({
-    user: user._id,
-    pg: pg._id,
-    roomType,
-    foodingType,
-    ac,
-    status: "pending", // Default status is 'pending'
-  });
-
-  // Save the booking
-  await booking.save();
-
-  // Increment the booked room count
-  room.availability.booked += 1;
-  await pg.save();
-
-  return res
-    .status(201)
-    .json(new ResponseHandler(201, "Booking created successfully.", booking));
 });
 
 //update a booking
@@ -222,7 +173,6 @@ module.exports = {
   getAllPgsListed,
   removePg,
   toggleVerifyPg,
-  createBooking,
   updateBookingStatus,
   getAllBookings,
 };
