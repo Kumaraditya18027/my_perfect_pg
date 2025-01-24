@@ -107,9 +107,9 @@ const loginUser = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateTokens(user._id);
 
   //fetching logged in user
-  const loggedInUser = await User.findById(user._id).select(
-    "-_id -password -refreshToken"
-  );
+  const loggedInUser = await User.findById(user._id)
+    .select("uuid name username email address phone avatar bio bookmarkedPg")
+    .populate("bookmarkedPg", "name address rating pictures");
 
   //configuring cookie options
   const options = {
