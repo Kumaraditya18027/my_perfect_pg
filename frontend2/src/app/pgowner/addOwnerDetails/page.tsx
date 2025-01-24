@@ -1,9 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { decryptToken } from "@/utils/secureToken";
 
 const OwnerDetailsForm = () => {
   const router = useRouter();
+  const { currentUserData } = useAuth();
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [gender, setGender] = useState("");
@@ -20,11 +23,11 @@ const OwnerDetailsForm = () => {
   const [profession, setProfession] = useState("");
   const [rating, setRating] = useState(0);
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
+    name: currentUserData?.name,
+    phone: currentUserData?.phone,
+    email: currentUserData?.email,
     profession: "",
-    address: "",
+    address: currentUserData?.address,
     pictures: [],
     deleted: false,
   });
@@ -75,14 +78,6 @@ const OwnerDetailsForm = () => {
         const parsedPictures = JSON.parse(rawPictures);
         setPictures(parsedPictures);
       }
-
-      // Update formData with the new values
-      setFormData((prev) => ({
-        ...prev,
-        name: searchParams.get("name") || "",
-        address: searchParams.get("address") || "",
-        profession: searchParams.get("profession") || "",
-      }));
     } catch (error) {
       console.error("Error parsing search parameters:", error, {
         stack: error.stack,
@@ -190,27 +185,29 @@ const OwnerDetailsForm = () => {
     }
 
     // Append owner details
-    // formDataToSend.append("ownerDetails[name]", formData.name);
-    // formDataToSend.append("ownerDetails[phone]", formData.phone);
-    // formDataToSend.append("ownerDetails[email]", formData.email);
-    // formDataToSend.append("ownerDetails[address]", formData.address);
+    formDataToSend.append("ownerName", formData.name);
+    formDataToSend.append("ownerPhone", formData.phone);
+    formDataToSend.append("ownerEmail", formData.email);
+    formDataToSend.append("ownerAddress", formData.address);
     formDataToSend.append("profession", formData.profession);
 
     console.log("Data to be submitted:", Array.from(formDataToSend.entries())); // Debugging
 
     try {
+      const token = decryptToken(localStorage.getItem("authToken"));
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/pgowner/add-pg`,
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Do not set "Content-Type" with FormData
+            Authorization: `Bearer ${token}`, // Do not set "Content-Type" with FormData
           },
           body: formDataToSend,
         }
       );
 
-      console.log(response);
+      // console.log(response.json());
 
       if (!response.ok) {
         console.log(response);
@@ -219,6 +216,7 @@ const OwnerDetailsForm = () => {
 
       const data = await response.json();
       console.log(data);
+      router.push("/pgowner");
     } catch (error: any) {
       console.error("Submission error:", error);
       setErrors(error.message || "Something went wrong. Please try again.");
