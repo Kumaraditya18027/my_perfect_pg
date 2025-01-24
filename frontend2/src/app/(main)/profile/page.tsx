@@ -53,26 +53,7 @@ export default function ProfilePage() {
       rating: 4.5,
       joinedDate: "Jan 2024",
     },
-    bookmarks: [
-      {
-        id: 1,
-        name: "Green Valley PG",
-        location: "Powai, Mumbai",
-        price: "₹14,000/month",
-        amenities: ["WiFi", "AC", "Food"],
-        rating: 4.8,
-        image: "/api/placeholder/200/150",
-      },
-      {
-        id: 2,
-        name: "Comfort Homes PG",
-        location: "Bandra West, Mumbai",
-        price: "₹16,000/month",
-        amenities: ["WiFi", "AC", "Food", "Gym"],
-        rating: 4.6,
-        image: "/api/placeholder/200/150",
-      },
-    ],
+    bookmarks: currentUserData?.bookmarkedPg,
   });
 
   const handleProfileImageUpdate = (event) => {
@@ -224,10 +205,10 @@ export default function ProfilePage() {
   };
 
   // Handle Bookmark Deletion
-  const handleDeleteBookmark = (id) => {
+  const handleDeleteBookmark = (name) => {
     setUser((prev) => ({
       ...prev,
-      bookmarks: prev.bookmarks.filter((bookmark) => bookmark.id !== id),
+      bookmarks: prev.bookmarks.filter((bookmark) => bookmark.name !== name),
     }));
     setDeleteModalOpen(false);
     showNotification("Bookmark removed successfully!");
@@ -343,44 +324,45 @@ export default function ProfilePage() {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h3 className="text-xl font-semibold mb-6">Bookmarked PGs</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {user.bookmarks.map((bookmark) => (
-              <div
-                key={bookmark.id}
-                className="group relative bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-all duration-300"
-              >
-                <div className="flex space-x-4">
-                  <img
-                    src={bookmark.image}
-                    alt={bookmark.name}
-                    className="w-1/3 rounded-lg object-cover"
-                  />
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{bookmark.name}</h4>
-                    <p className="text-gray-500 text-sm mt-1">
-                      {bookmark.location}
-                    </p>
-                    <div
-                      className={`mt-2 ${COLOR_SCHEME.primary.text} font-medium`}
+            {currentUserData?.bookmarkedPg?.length > 0 &&
+              currentUserData.bookmarkedPg.map((bookmark) => (
+                <div
+                  key={bookmark.name}
+                  className="group relative bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-all duration-300"
+                >
+                  <div className="flex space-x-4">
+                    <img
+                      src={bookmark.pictures[0]}
+                      alt={bookmark.name}
+                      className="w-1/3 rounded-lg object-cover"
+                    />
+                    <div className="flex-1">
+                      <h4 className="font-semibold">{bookmark.name}</h4>
+                      <p className="text-gray-500 text-sm mt-1">
+                        {bookmark.address}
+                      </p>
+                      <div
+                        className={`mt-2 ${COLOR_SCHEME.primary.text} font-medium`}
+                      >
+                        {bookmark.price}
+                      </div>
+                      <div className="mt-2 flex items-center space-x-1">
+                        <span className="text-yellow-400">★</span>
+                        <span>{bookmark.rating}</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setSelectedBookmark(bookmark.name);
+                        setDeleteModalOpen(true);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 absolute top-2 right-2 p-2 text-red-500 hover:text-red-700 transition-opacity"
                     >
-                      {bookmark.price}
-                    </div>
-                    <div className="mt-2 flex items-center space-x-1">
-                      <span className="text-yellow-400">★</span>
-                      <span>{bookmark.rating}</span>
-                    </div>
+                      ×
+                    </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      setSelectedBookmark(bookmark.id);
-                      setDeleteModalOpen(true);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 absolute top-2 right-2 p-2 text-red-500 hover:text-red-700 transition-opacity"
-                  >
-                    ×
-                  </button>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       </main>
