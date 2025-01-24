@@ -52,6 +52,7 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
   const [pg, setPg] = useState<PgDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [bookingStatus, setBookingStatus] = useState<Array<string>>([]);
 
   useEffect(() => {
     if (pgId) {
@@ -70,6 +71,7 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
               },
             }
           );
+          // console.log(response.json());
 
           if (!response.ok) {
             throw new Error("Failed to fetch PG details.");
@@ -77,7 +79,12 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
 
           const data = await response.json();
           console.log(data);
-          setPg(data.data);
+          setPg(data.data.pg);
+
+          const bookedRoomTypes = data.data.booking.map(
+            (booked) => booked.roomType
+          );
+          setBookingStatus(bookedRoomTypes);
           setLoading(false);
         } catch (err: any) {
           console.error(err);
@@ -89,6 +96,45 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
       fetchPgDetails();
     }
   }, [pgId]);
+
+  const handleBooking = async (
+    roomType: string,
+    ac: boolean,
+    foodingType: string
+  ) => {
+    try {
+      const token = decryptToken(localStorage.getItem("authToken"));
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user/create-booking`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            pgId,
+            roomType,
+            ac,
+            foodingType,
+          }),
+        }
+      );
+
+      // console.log(response.json());
+      if (!response.ok) {
+        throw new Error("Failed to request book PG.");
+      }
+
+      const data = await response.json();
+      console.log(data);
+      setBookingStatus((prev) => [...prev, roomType]);
+      setLoading(false);
+    } catch (err: any) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return <div className="text-center mt-8">Loading...</div>;
@@ -154,8 +200,28 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
             pg.rooms?.map((room, index) => (
               <div
                 key={index}
-                className="border rounded-lg p-4 shadow-lg hover:shadow-2xl transition-shadow duration-300"
+                className="relative border rounded-lg p-4 shadow-lg hover:shadow-2xl transition-shadow duration-300"
               >
+                <button
+                  className={`absolute right-4 px-4 py-2 rounded ${
+                    bookingStatus.includes(room.type)
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-green-800 text-white"
+                  }`}
+                  onClick={() =>
+                    !bookingStatus.includes(room.type) &&
+                    handleBooking(
+                      room.type,
+                      room.features.ac,
+                      room.features.fooding || "N/A"
+                    )
+                  }
+                  disabled={bookingStatus.includes(room.type)}
+                >
+                  {bookingStatus.includes(room.type)
+                    ? "Request Sent"
+                    : "Request Booking"}
+                </button>
                 <h3 className="text-lg font-bold text-gray-800 capitalize">
                   {room.type} Room
                 </h3>
