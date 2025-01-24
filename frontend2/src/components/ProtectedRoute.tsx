@@ -12,9 +12,9 @@ const ProtectedRoute = ({
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
-  const isLoggedIn = localStorage.getItem("isLoggedIn");
 
   useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
     console.log("Is authenticated", isLoggedIn);
     console.log("Required user type", userType);
     const loggedInUserType = localStorage.getItem("loggedInUserType");
@@ -25,7 +25,7 @@ const ProtectedRoute = ({
     } else {
       setIsLoading(false); // Allow rendering once authenticated and user type matches
     }
-  }, [isLoggedIn, router, userType]);
+  }, [router, userType]);
 
   if (isLoading) {
     return <Loading />; // Show nothing while redirecting

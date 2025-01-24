@@ -85,7 +85,7 @@ const PopularPGSection = () => {
       <h2 className="text-4xl font-normal mb-8">Popular PG</h2>
       <p>{error && error.message}</p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <p className="text-black">{message !== "" && message}</p>
+        {message !== "" && <p className="text-black">{message}</p>}
         {pgList &&
           pgList.map((pg, index) => (
             <div key={index} className="bg-gray-50 rounded-3xl p-6 relative">
