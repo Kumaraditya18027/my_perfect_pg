@@ -70,21 +70,24 @@ const AllBookings: React.FC = () => {
                   Location
                 </th>
                 <th scope="col" className="px-6 py-3 font-semibold">
-                  Amount
+                  Room Type
                 </th>
                 <th scope="col" className="px-6 py-3 font-semibold">
-                  Assigned Member
+                  Fooding Type
+                </th>
+                <th scope="col" className="px-6 py-3 font-semibold">
+                  AC
+                </th>
+                <th scope="col" className="px-6 py-3 font-semibold">
+                  Customer
                 </th>
                 <th scope="col" className="px-6 py-3 font-semibold">
                   Phone Number
                 </th>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Action
-                </th>
               </tr>
             </thead>
             <tbody>
-              {bookedPGs.map((pg, index) => (
+              {bookedPGs.map((booking, index) => (
                 <tr
                   key={index}
                   className="bg-white shadow-md rounded-lg hover:shadow-lg transition-all duration-300"
@@ -92,7 +95,7 @@ const AllBookings: React.FC = () => {
                   <td className="pl-6 py-5 rounded-l-xl">
                     <div className="flex items-center">
                       <Image
-                        src={pg.picture || "/placeholder.jpg"}
+                        src={booking.pg.pictures?.[0] || "/placeholder.jpg"}
                         alt="pg-image"
                         width={50}
                         height={50}
@@ -100,21 +103,13 @@ const AllBookings: React.FC = () => {
                       />
                     </div>
                   </td>
-                  <td className="px-6 py-5">{pg.name}</td>
-                  <td className="px-6 py-5">{pg.location}</td>
-                  <td className="px-6 py-5">{pg.amount}</td>
-                  <td className="px-6 py-5">{pg.assign_member}</td>
-                  <td className="px-6 py-5">{pg.ph_number}</td>
-                  <td className="pr-6 py-5 rounded-r-xl">
-                    <Link
-                      href={`/admin/bookedpg/${pg.name
-                        .split(" ")
-                        .join("-")
-                        .toLowerCase()}`}
-                    >
-                      <FaArrowCircleRight className="text-2xl text-blue-500 hover:text-blue-600 transition" />
-                    </Link>
-                  </td>
+                  <td className="px-6 py-5">{booking.pg.name}</td>
+                  <td className="px-6 py-5">{booking.pg.address}</td>
+                  <td className="px-6 py-5">{booking.roomType}</td>
+                  <td className="px-6 py-5">{booking.foodingType}</td>
+                  <td className="px-6 py-5">{booking.ac ? "Yes" : "No"}</td>
+                  <td className="px-6 py-5">{booking.user.name}</td>
+                  <td className="px-6 py-5">{booking.user.phone}</td>
                 </tr>
               ))}
             </tbody>
