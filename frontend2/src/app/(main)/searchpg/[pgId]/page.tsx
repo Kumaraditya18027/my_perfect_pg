@@ -79,7 +79,7 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
           }
 
           const data = await response.json();
-          console.log(data);
+          // console.log(data);
           setPg(data.data.pg);
 
           const bookedRoomTypes = data.data.booking.map(
@@ -128,7 +128,7 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
       }
 
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       setBookingStatus((prev) => [...prev, roomType]);
       setLoading(false);
     } catch (err: any) {

@@ -43,7 +43,7 @@ const RegisterPage: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log("Registration successful:", data.data);
+      // console.log("Registration successful:", data.data);
 
       // Redirect to desired page after registration
       router.push("/login");

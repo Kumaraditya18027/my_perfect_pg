@@ -329,7 +329,7 @@ const PGShowcase = () => {
         }
       );
 
-      console.log(response.json());
+      // console.log(response.json());
       const data = await response.json(); // Parse response data
 
       // Check for success

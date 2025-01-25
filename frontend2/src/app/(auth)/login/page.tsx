@@ -42,7 +42,7 @@ const LoginPage: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       login(data.data.accessToken, formData.userType, data.data.user);
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");

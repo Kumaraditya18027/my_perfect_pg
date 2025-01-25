@@ -38,7 +38,7 @@ const OwnerDetailsForm = () => {
   const professions = ["Students", "Working Professionals"];
 
   useEffect(() => {
-    console.log("useEffect triggered");
+    // console.log("useEffect triggered");
 
     try {
       // Log all search parameters
@@ -46,20 +46,20 @@ const OwnerDetailsForm = () => {
       searchParams.forEach((value, key) => {
         paramsObject[key] = value;
       });
-      console.log("All search parameters:", paramsObject);
+      // console.log("All search parameters:", paramsObject);
 
       // Get and parse rooms
       const rawRooms = searchParams.get("rooms");
-      console.log("Raw rooms:", rawRooms);
+      // console.log("Raw rooms:", rawRooms);
       const parsedRooms = rawRooms ? JSON.parse(rawRooms) : [];
-      console.log("Parsed rooms:", parsedRooms);
+      // console.log("Parsed rooms:", parsedRooms);
       setRooms(parsedRooms);
 
       // Get and parse services
       const rawServices = searchParams.get("services");
-      console.log("Raw services:", rawServices);
+      // console.log("Raw services:", rawServices);
       const parsedServices = rawServices ? JSON.parse(rawServices) : {};
-      console.log("Parsed services:", parsedServices);
+      // console.log("Parsed services:", parsedServices);
       const formattedServices = formatServices(parsedServices);
       setServices(formattedServices);
 
@@ -147,10 +147,10 @@ const OwnerDetailsForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submission started");
+    // console.log("Form submission started");
 
     if (!validateForm()) {
-      console.log("Form validation failed", errors);
+      // console.log("Form validation failed", errors);
       return;
     }
 
@@ -191,7 +191,7 @@ const OwnerDetailsForm = () => {
     formDataToSend.append("ownerAddress", formData.address);
     formDataToSend.append("profession", formData.profession);
 
-    console.log("Data to be submitted:", Array.from(formDataToSend.entries())); // Debugging
+    // console.log("Data to be submitted:", Array.from(formDataToSend.entries())); // Debugging
 
     try {
       const token = decryptToken(localStorage.getItem("authToken"));
@@ -210,12 +210,12 @@ const OwnerDetailsForm = () => {
       // console.log(response.json());
 
       if (!response.ok) {
-        console.log(response);
+        // console.log(response);
         throw new Error("Submission failed. Please check your data.");
       }
 
       const data = await response.json();
-      console.log(data);
+      // console.log(data);
       router.push("/pgowner");
     } catch (error: any) {
       console.error("Submission error:", error);
