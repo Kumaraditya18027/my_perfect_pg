@@ -41,6 +41,7 @@ const editProfile = asyncHandler(async (req, res) => {
 const bookmarkPg = asyncHandler(async (req, res) => {
   const { pgId } = req.body;
   const userId = req.user._id;
+  console.log(userId);
 
   if (!userId || !pgId) {
     throw new ValidationError("User ID and PG ID required!");
@@ -53,8 +54,8 @@ const bookmarkPg = asyncHandler(async (req, res) => {
     throw new NotFoundError("User not found!");
   }
 
-  const pg = await Pg.findById(pgId);
-  if (!user) {
+  const pg = await Pg.findOne({ uuid: pgId });
+  if (!pg) {
     throw new NotFoundError("PG not found!");
   }
 
