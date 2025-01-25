@@ -117,6 +117,40 @@ const createBooking = asyncHandler(async (req, res) => {
     .json(new ResponseHandler(201, "Booking created successfully.", booking));
 });
 
+// Search PGs by name, address, or gender
+const searchPg = asyncHandler(async (req, res) => {
+  const { query } = req.query; // Get search query from query parameter
+
+  if (!query) {
+    return res.status(400).json({ message: "Search query is required" });
+  }
+
+  try {
+    // Find PGs matching the query in name, address, or gender
+    const searchResults = await Pg.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { address: { $regex: query, $options: "i" } },
+        { gender: { $regex: query, $options: "i" } },
+      ],
+      deleted: false,
+    }).exec();
+
+    if (searchResults.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No PGs found matching the search criteria" });
+    }
+
+    return res.status(200).json(searchResults);
+  } catch (error) {
+    console.error("Search Error:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error, please try again later" });
+  }
+});
+
 //book a pg visit
 const bookPgVisit = asyncHandler(async (req, res) => {});
 
@@ -125,4 +159,5 @@ module.exports = {
   bookPgVisit,
   getPgDetails,
   createBooking,
+  searchPg,
 };

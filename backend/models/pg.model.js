@@ -18,6 +18,7 @@ const pgSchema = new mongoose.Schema(
       type: String,
       enum: ["male", "female", "unisex"],
       required: true,
+      index: true,
     },
     rooms: [
       {
