@@ -43,11 +43,7 @@ const addPg = asyncHandler(async (req, res) => {
     !longitude ||
     !timings ||
     !owner ||
-    !profession ||
-    !ownerName ||
-    !ownerPhone ||
-    !ownerEmail ||
-    !ownerAddress
+    !profession
   ) {
     throw new ApiError(400, "All required fields must be provided!");
   }
@@ -79,8 +75,8 @@ const addPg = asyncHandler(async (req, res) => {
       }
     }
 
-    const parsedServices = JSON.parse(services);
-    const parsedRooms = JSON.parse(rooms);
+    const parsedServices = services && JSON.parse(services);
+    const parsedRooms = rooms && JSON.parse(rooms);
 
     // Create a new PG document with the uploaded picture URLs
     const pg = new Pg({
@@ -105,10 +101,10 @@ const addPg = asyncHandler(async (req, res) => {
     await pg.save({ session });
 
     // Update the owner's details
-    ownerUser.name = ownerName;
-    ownerUser.phone = ownerPhone;
-    ownerUser.email = ownerEmail;
-    ownerUser.address = ownerAddress;
+    if (ownerName) ownerUser.name = ownerName;
+    if (ownerPhone) ownerUser.phone = ownerPhone;
+    if (ownerEmail) ownerUser.email = ownerEmail;
+    if (ownerAddress) ownerUser.address = ownerAddress;
 
     // Save the updated owner within the session
     await ownerUser.save({ session });
@@ -126,6 +122,69 @@ const addPg = asyncHandler(async (req, res) => {
     session.endSession();
     console.error("Transaction failed:", error);
     throw new ApiError(500, "Failed to add PG. Please try again.");
+  }
+});
+
+//add rooms
+const addRoom = asyncHandler(async (req, res) => {
+  const { pgId, type, features, rates, availability } = req.body;
+
+  // Validate required fields
+  if (!pgId || !type || !features || !rates || !availability) {
+    throw new ApiError(400, "All required fields must be provided!");
+  }
+
+  // Validate PG existence
+  const pg = await Pg.findOne({ uuid: pgId });
+  if (!pg) {
+    throw new ApiError(404, "PG not found!");
+  }
+
+  // Start a session for the transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // If pictures are uploaded, upload them to Cloudinary
+    const pictureFiles = req.files || null;
+    const pictureUrls = [];
+    if (pictureFiles && pictureFiles.length > 0) {
+      for (const file of pictureFiles) {
+        const uploadedUrl = await uploadFileOnCloudinary(file.path); // Implement your Cloudinary uploader
+        if (uploadedUrl) {
+          pictureUrls.push(uploadedUrl);
+        }
+      }
+    }
+
+    // Add the new room
+    const newRoom = {
+      type,
+      features: JSON.parse(features),
+      rates: JSON.parse(rates),
+      availability: JSON.parse(availability),
+      pictures:
+        pictureUrls.length > 0 ? pictureUrls : JSON.parse(pictures || "[]"),
+    };
+
+    pg.rooms.push(newRoom);
+
+    // Save the PG with the updated rooms
+    await pg.save({ session });
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return res
+      .status(201)
+      .json(new ResponseHandler(201, "Room added successfully!", newRoom));
+  } catch (error) {
+    // If any operation fails, abort the transaction
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Transaction failed:", error);
+    throw new ApiError(500, "Failed to add room. Please try again.");
   }
 });
 
@@ -215,7 +274,9 @@ const getPg = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Owner ID not found!");
   }
 
-  const pg = await Pg.find({ owner }).select("-_id");
+  const pg = await Pg.find({ owner }).select(
+    "-_id uuid name address isAdminVerified rating pictures"
+  );
 
   if (!pg) {
     return res.status(200).json(new ResponseHandler(200, "No PG listed!"));
@@ -224,6 +285,28 @@ const getPg = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ResponseHandler(200, "PG fetched successfully!", pg));
+});
+
+//get rooms
+const getRooms = asyncHandler(async (req, res) => {
+  const owner = req.user._id;
+  const { pgId } = req.params;
+  console.log(pgId);
+  if (!owner || !pgId) {
+    throw new ValidationError("Owner ID and PG ID required!");
+  }
+
+  const room = await Pg.findOne({ $and: [{ owner }, { uuid: pgId }] }).select(
+    "-_id name rooms"
+  );
+
+  if (!room) {
+    return res.status(200).json(new ResponseHandler(200, "No Rooms found!"));
+  }
+
+  return res
+    .status(200)
+    .json(new ResponseHandler(200, "Rooms fetched successfully!", room));
 });
 
 //get all bookings
@@ -237,7 +320,9 @@ const getAllBookings = asyncHandler(async (req, res) => {
   // Fetch the PGs owned by the user
   const pg = await Pg.find({ owner: userId }).select("_id");
   if (!pg || pg.length === 0) {
-    throw new NotFoundError("PG not found for this user!");
+    return res
+      .status(200)
+      .json(new ResponseHandler(200, "You have not added any PG yet!"));
   }
 
   // Fetch bookings based on the PG IDs
@@ -257,4 +342,12 @@ const getAllBookings = asyncHandler(async (req, res) => {
     .json(new ResponseHandler(200, "Bookings fetched successfully.", bookings));
 });
 
-module.exports = { addPg, editPg, removePg, getPg, getAllBookings };
+module.exports = {
+  addPg,
+  addRoom,
+  editPg,
+  removePg,
+  getPg,
+  getRooms,
+  getAllBookings,
+};

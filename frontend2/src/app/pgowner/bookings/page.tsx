@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { FaArrowCircleRight } from "react-icons/fa";
 import { decryptToken } from "@/utils/secureToken";
 
 const AllBookings: React.FC = () => {
@@ -25,6 +23,8 @@ const AllBookings: React.FC = () => {
             },
           }
         );
+
+        // console.log(response.json());
 
         if (!response.ok) {
           throw new Error("Failed to fetch booked PGs.");
@@ -87,31 +87,35 @@ const AllBookings: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {bookedPGs.map((booking, index) => (
-                <tr
-                  key={index}
-                  className="bg-white shadow-md rounded-lg hover:shadow-lg transition-all duration-300"
-                >
-                  <td className="pl-6 py-5 rounded-l-xl">
-                    <div className="flex items-center">
-                      <Image
-                        src={booking.pg.pictures?.[0] || "/placeholder.jpg"}
-                        alt="pg-image"
-                        width={50}
-                        height={50}
-                        className="size-12 rounded-lg"
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-5">{booking.pg.name}</td>
-                  <td className="px-6 py-5">{booking.pg.address}</td>
-                  <td className="px-6 py-5">{booking.roomType}</td>
-                  <td className="px-6 py-5">{booking.foodingType}</td>
-                  <td className="px-6 py-5">{booking.ac ? "Yes" : "No"}</td>
-                  <td className="px-6 py-5">{booking.user.name}</td>
-                  <td className="px-6 py-5">{booking.user.phone}</td>
-                </tr>
-              ))}
+              {bookedPGs.length > 0 ? (
+                bookedPGs.map((booking, index) => (
+                  <tr
+                    key={index}
+                    className="bg-white shadow-md rounded-lg hover:shadow-lg transition-all duration-300"
+                  >
+                    <td className="pl-6 py-5 rounded-l-xl">
+                      <div className="flex items-center">
+                        <Image
+                          src={booking.pg.pictures?.[0] || "/placeholder.jpg"}
+                          alt="pg-image"
+                          width={50}
+                          height={50}
+                          className="size-12 rounded-lg"
+                        />
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">{booking.pg.name}</td>
+                    <td className="px-6 py-5">{booking.pg.address}</td>
+                    <td className="px-6 py-5">{booking.roomType}</td>
+                    <td className="px-6 py-5">{booking.foodingType}</td>
+                    <td className="px-6 py-5">{booking.ac ? "Yes" : "No"}</td>
+                    <td className="px-6 py-5">{booking.user.name}</td>
+                    <td className="px-6 py-5">{booking.user.phone}</td>
+                  </tr>
+                ))
+              ) : (
+                <p>No Bookings available</p>
+              )}
             </tbody>
           </table>
         </div>

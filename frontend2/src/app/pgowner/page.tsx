@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { decryptToken } from "@/utils/secureToken";
+import { useRouter } from "next/navigation";
 
 // app/pgowner/page.tsx
 const PgOwnerHome = () => {
+  const router = useRouter();
   const { currentUserData } = useAuth();
   const [pgListed, setPgListed] = useState<Array<object>>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -53,18 +55,19 @@ const PgOwnerHome = () => {
   }
 
   return (
-    <div>
+    <div className="p-6">
       <h1 className="text-2xl font-bold">
         Welcome, {currentUserData?.name || "PG Owner"}!
       </h1>
       <p>Select an option from the navbar to manage your PG.</p>
-      <h2 className="text-xl font-semibold mt-4">PG Added</h2>
+      <h2 className="text-xl font-semibold my-4">PG Added</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {pgListed?.length > 0 &&
+        {pgListed?.length > 0 ? (
           pgListed.map((pg) => (
             <div
               key={pg?.name}
-              className="group relative bg-white shadow-md rounded-lg p-6 hover:shadow-lg hover:bg-gray-50 transition-all duration-300"
+              className="cursor-pointer group relative bg-white shadow-md rounded-lg p-6 hover:shadow-lg hover:bg-gray-50 transition-all duration-300"
+              onClick={() => router.push(`/pgowner/${pg?.uuid}`)}
             >
               <div className="flex space-x-6">
                 <img
@@ -95,7 +98,10 @@ const PgOwnerHome = () => {
                 </div>
               </div>
             </div>
-          ))}
+          ))
+        ) : (
+          <p>No PG added.</p>
+        )}
       </div>
     </div>
   );
