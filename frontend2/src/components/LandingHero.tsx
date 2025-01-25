@@ -1,8 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import HomeNavbar from "./HomeNavbar";
+import { useRouter } from "next/navigation";
 
 const LandingPage = () => {
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -95,30 +97,36 @@ const LandingPage = () => {
           </div>
         </div>
 
-        {searchResults.length > 0 && (
-          <div className="mt-6 w-[40rem] max-w-2xl bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-lg font-bold mb-4">Search Results</h2>
-            <ul>
-              {searchResults.map((pg, index) => (
-                <li key={index} className="border-b py-4">
-                  <div className="flex items-center gap-x-4">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{pg.name}</h3>
-                      <p className="text-gray-600">{pg.address}</p>
-                      <p className="text-gray-600">{pg.gender}</p>
+        <div className="absolute top-[62%]">
+          {searchResults.length > 0 && (
+            <div className="mt-6 w-[40rem] max-w-2xl bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-lg font-bold mb-4">Search Results</h2>
+              <ul>
+                {searchResults.map((pg, index) => (
+                  <li
+                    key={index}
+                    className="border-b py-4 cursor-pointer"
+                    onClick={() => router.push(`/searchpg/${pg.uuid}`)}
+                  >
+                    <div className="flex items-center gap-x-4">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg">{pg.name}</h3>
+                        <p className="text-gray-600">{pg.address}</p>
+                        <p className="text-gray-600">{pg.gender}</p>
+                      </div>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-        {searchResults.length === 0 && !loading && searchQuery && (
-          <p className="mt-4 text-white">
-            No PGs found matching "{searchQuery}"
-          </p>
-        )}
+          {searchResults.length === 0 && !loading && searchQuery && (
+            <p className="mt-4 text-white">
+              No PGs found matching "{searchQuery}"
+            </p>
+          )}
+        </div>
       </main>
     </div>
   );
