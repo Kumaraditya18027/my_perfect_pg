@@ -151,6 +151,45 @@ const searchPg = asyncHandler(async (req, res) => {
   }
 });
 
+// Get PGs near the user
+const getDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Earth radius in kilometers
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // Distance in kilometers
+  return distance;
+};
+
+const getNearbyPGs = async (req, res) => {
+  const { lat, long } = req.query;
+
+  try {
+    const pgListings = await Pg.find().select("-_id -owner"); // Fetch all PG listings from the database
+
+    const nearbyPGs = pgListings.filter((pg) => {
+      const distance = getDistance(
+        lat,
+        long,
+        pg.location.latitude,
+        pg.location.longitude
+      );
+      return distance <= 5; // Filter PGs within 5 km radius (adjust as needed)
+    });
+
+    res.json(nearbyPGs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch nearby PGs" });
+  }
+};
+
 //book a pg visit
 const bookPgVisit = asyncHandler(async (req, res) => {});
 
@@ -160,4 +199,5 @@ module.exports = {
   getPgDetails,
   createBooking,
   searchPg,
+  getNearbyPGs,
 };

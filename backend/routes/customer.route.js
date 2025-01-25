@@ -6,6 +6,7 @@ const { logoutUser } = require("../controllers/user/auth.controller");
 const {
   getAllPgs,
   getPgDetails,
+  getNearbyPGs,
 } = require("../controllers/customer/pg.controller.js");
 const {
   bookmarkPg,
@@ -17,6 +18,7 @@ router.route("/customer-logout").post(authHandler(), logoutUser);
 
 //pg
 router.route("/customer/get-all-pgs").get(authHandler(), getAllPgs);
+router.route("/customer/get-nearby-pg").get(authHandler(), getNearbyPGs);
 router.route("/customer/get-pg-details/:pgId").get(authHandler(), getPgDetails);
 router.route("/customer/bookmark-pg").post(authHandler(), bookmarkPg);
 
