@@ -6,11 +6,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { encryptToken } from "@/utils/secureToken";
 
 interface AuthContextType {
-  isAuthenticated: boolean;
-  // loggedInUserType: string;
   currentUserData: object | null;
   login: (token: string, userType: string, userData: object) => void;
   logout: () => void;
+  editUserData: (userData: object) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

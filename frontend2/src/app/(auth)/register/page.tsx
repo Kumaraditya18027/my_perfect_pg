@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import HomeNavbar from "@/components/HomeNavbar";
-import { useAuth } from "@/app/contexts/AuthContext";
 
 interface FormData {
   name: string;
@@ -13,7 +12,6 @@ interface FormData {
 
 const RegisterPage: React.FC = () => {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
