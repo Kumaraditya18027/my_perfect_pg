@@ -1,5 +1,6 @@
 // import Navbar from "@/components/Navbar2";
 "use client";
+import Loading from "@/components/Loading";
 import { decryptToken } from "@/utils/secureToken";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -261,6 +262,7 @@ const PGShowcase = () => {
   };
 
   const filteredPg = useMemo(() => {
+    if (!pg || !Array.isArray(pg)) return [];
     return pg?.filter((pg) => {
       const searchLower = searchPg.toLowerCase();
       const priceCondition =
@@ -307,15 +309,11 @@ const PGShowcase = () => {
   }, [filteredPg, sortPg]);
 
   if (loading) {
-    return <div className="text-center mt-8">Loading...</div>;
+    return <Loading />;
   }
 
   if (error) {
     return <div className="text-center mt-8 text-red-500">{error}</div>;
-  }
-
-  if (!pg) {
-    return <div className="text-center mt-8">No PG listed currently.</div>;
   }
 
   return (
@@ -396,11 +394,11 @@ const PGShowcase = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 min-h-screen">
         {/* Results Info */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">
-            {filteredPg.length} PGs Available
+            {filteredPg.length || 0} PGs Available
           </h2>
           <select
             value={sortPg}
@@ -416,80 +414,88 @@ const PGShowcase = () => {
 
         {/* PG Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sortedPg.map((pg) => (
-            <div
-              key={pg.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
-            >
-              {/* Image */}
-              <div className="relative group">
-                <Image
-                  src={pg.images[0]}
-                  alt={pg.name}
-                  width={500}
-                  height={300}
-                  className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full text-sm font-medium text-blue-600">
-                  {pg.gender} PG
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-bold text-gray-800">{pg.name}</h3>
-                  <div className="flex items-center bg-green-50 px-2 py-1 rounded-lg">
-                    <span className="text-green-700 font-medium">
-                      {pg.rating}
-                    </span>
-                    <span className="text-green-700 ml-1">★</span>
+          {sortedPg && sortedPg.length > 0 ? (
+            sortedPg.map((pg) => (
+              <div
+                key={pg.id}
+                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+              >
+                {/* Image */}
+                <div className="relative group">
+                  <Image
+                    src={pg.images[0]}
+                    alt={pg.name}
+                    width={500}
+                    height={300}
+                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full text-sm font-medium text-blue-600">
+                    {pg.gender} PG
                   </div>
                 </div>
 
-                <div className="flex items-center text-gray-600 mb-4">
-                  <LocationIcon />
-                  <span className="ml-2">{pg?.address}</span>
-                </div>
-
-                <div className="mb-4">
-                  <div className="flex flex-wrap gap-2">
-                    {pg.amenities.map((amenity, index) => (
-                      <span
-                        key={index}
-                        className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm"
-                      >
-                        {amenity}
+                {/* Content */}
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-xl font-bold text-gray-800">
+                      {pg.name}
+                    </h3>
+                    <div className="flex items-center bg-green-50 px-2 py-1 rounded-lg">
+                      <span className="text-green-700 font-medium">
+                        {pg.rating}
                       </span>
-                    ))}
+                      <span className="text-green-700 ml-1">★</span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-2xl font-bold text-gray-800">
-                      ₹{pg.price}
-                    </span>
-                    <span className="text-gray-600 text-sm">/month</span>
+                  <div className="flex items-center text-gray-600 mb-4">
+                    <LocationIcon />
+                    <span className="ml-2">{pg?.address}</span>
                   </div>
-                  <button
-                    onClick={() => router.push(`/searchpg/${pg?.id}`)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition-colors"
-                  >
-                    View Details
-                  </button>
+
+                  <div className="mb-4">
+                    <div className="flex flex-wrap gap-2">
+                      {pg.amenities.map((amenity, index) => (
+                        <span
+                          key={index}
+                          className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm"
+                        >
+                          {amenity}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-2xl font-bold text-gray-800">
+                        ₹{pg.price}
+                      </span>
+                      <span className="text-gray-600 text-sm">/month</span>
+                    </div>
+                    <button
+                      onClick={() => router.push(`/searchpg/${pg?.id}`)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition-colors"
+                    >
+                      View Details
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>No PG available</p>
+          )}
         </div>
 
         {/* Load More */}
-        <div className="text-center mt-12">
-          <button className="bg-white hover:bg-gray-50 text-blue-600 font-semibold px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all">
-            Load More PGs
-          </button>
-        </div>
+        {pg && pg.length > 6 && (
+          <div className="text-center mt-12">
+            <button className="bg-white hover:bg-gray-50 text-blue-600 font-semibold px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all">
+              Load More PGs
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Footer */}

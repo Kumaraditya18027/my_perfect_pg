@@ -1,4 +1,5 @@
 "use client";
+import Loading from "@/components/Loading";
 import { decryptToken } from "@/utils/secureToken";
 import React, { useEffect, useState } from "react";
 import { FaMapMarkerAlt, FaWifi, FaParking, FaStar } from "react-icons/fa";
@@ -137,7 +138,7 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
   };
 
   if (loading) {
-    return <div className="text-center mt-8">Loading...</div>;
+    return <Loading />;
   }
 
   if (error) {
