@@ -9,7 +9,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   // loggedInUserType: string;
   currentUserData: object | null;
-  login: (token: string, userType: string) => void;
+  login: (token: string, userType: string, userData: object) => void;
   logout: () => void;
 }
 
