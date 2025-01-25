@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import Loading from "./Loading";
 
@@ -11,16 +11,17 @@ const ProtectedRoute = ({
   userType: string;
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
-    console.log("Is authenticated", isLoggedIn);
-    console.log("Required user type", userType);
+    // console.log("Is authenticated", isLoggedIn);
+    // console.log("Required user type", userType);
     const loggedInUserType = localStorage.getItem("loggedInUserType");
-    console.log("Logged in user type", loggedInUserType);
+    // console.log("Logged in user type", loggedInUserType);
     if (!isLoggedIn || loggedInUserType !== userType) {
-      router.replace("/login"); // Redirect unauthenticated users to the login page
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`); // Redirect unauthenticated users to the login page
       return;
     } else {
       setIsLoading(false); // Allow rendering once authenticated and user type matches

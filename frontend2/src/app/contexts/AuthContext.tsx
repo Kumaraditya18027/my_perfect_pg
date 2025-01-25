@@ -2,7 +2,7 @@
 "use client";
 
 import React, { createContext, useContext, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { encryptToken } from "@/utils/secureToken";
 
 interface AuthContextType {
@@ -19,6 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentUserData, setCurrentUserData] = useState<object>({});
 
   const login = (token: string, userType: string, userData: object) => {
@@ -39,7 +40,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       } else {
         console.log("Going to user search page...");
-        router.push("/searchpg");
+        const nextPath = searchParams.get("next") || "/searchpg";
+        router.replace(nextPath);
         return;
       }
     }
