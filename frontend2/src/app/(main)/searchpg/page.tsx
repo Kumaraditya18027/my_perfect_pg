@@ -498,6 +498,19 @@ const PGShowcase = () => {
         )}
       </div>
 
+      {/* Footer Section */}
+      <div className="mt-8 text-center text-gray-500">
+        <p>
+          Can&apos;t find what you&apos;re looking for?{" "}
+          <button
+            className="text-blue-500 hover:underline"
+            onClick={() => router.push("/about")}
+          >
+            Contact Support
+          </button>
+        </p>
+      </div>
+
       {/* Footer */}
       <footer className="bg-white mt-16 py-8">
         <div className="max-w-7xl mx-auto px-6 text-center text-gray-600">
