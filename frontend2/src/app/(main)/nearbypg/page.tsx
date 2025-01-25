@@ -118,7 +118,10 @@ const PGListing = () => {
   const [listings, setListings] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [userLocation, setUserLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   useEffect(() => {
     // Request the user's location when the component is mounted
