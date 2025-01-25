@@ -8,5 +8,5 @@ const app = require("./app");
 
 connectDB();
 app.listen(process.env.PORT, () => {
-  console.log(`app is running on ${process.env.PORT}`);
+  console.log("app is running on");
 });
