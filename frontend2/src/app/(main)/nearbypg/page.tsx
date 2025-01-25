@@ -258,12 +258,14 @@ const PGListing = () => {
                       <span className="text-sm text-gray-500">/month</span>
                     </div>
                     <div>
-                      <Link
-                        href="/#app"
+                      <button
+                        onClick={() =>
+                          router.push(`/searchpg/${listing?.uuid}`)
+                        }
                         className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition-colors"
                       >
                         View Details
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 ))}
