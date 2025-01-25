@@ -11,7 +11,7 @@ function PgVerificationRequests() {
   useEffect(() => {
     const fetchPgRequests = async () => {
       try {
-        const token = decryptToken(localStorage.getItem("authToken"));
+        const token = decryptToken(localStorage.getItem("authToken") || "");
 
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/get-pgVerification-requests`,
@@ -42,7 +42,7 @@ function PgVerificationRequests() {
 
   const handleVerify = async (pgId: string) => {
     try {
-      const token = decryptToken(localStorage.getItem("authToken"));
+      const token = decryptToken(localStorage.getItem("authToken") || "");
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/toggle-pgVerfication`,

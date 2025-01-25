@@ -50,7 +50,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const token = decryptToken(localStorage.getItem("authToken"));
+      const token = decryptToken(localStorage.getItem("authToken") || "");
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-logout`,

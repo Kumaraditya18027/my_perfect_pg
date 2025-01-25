@@ -12,7 +12,7 @@ const AllBookings: React.FC = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const token = decryptToken(localStorage.getItem("authToken"));
+        const token = decryptToken(localStorage.getItem("authToken") || "");
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/pgowner/get-all-bookings`,
           {

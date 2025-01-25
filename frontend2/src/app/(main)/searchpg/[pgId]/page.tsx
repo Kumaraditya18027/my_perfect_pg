@@ -60,7 +60,7 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
       // Fetch the PG details from the backend using Fetch API
       const fetchPgDetails = async () => {
         try {
-          const token = decryptToken(localStorage.getItem("authToken"));
+          const token = decryptToken(localStorage.getItem("authToken") || "");
 
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/customer/get-pg-details/${pgId}`,
@@ -104,7 +104,7 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
     foodingType: string
   ) => {
     try {
-      const token = decryptToken(localStorage.getItem("authToken"));
+      const token = decryptToken(localStorage.getItem("authToken") || "");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user/create-booking`,
         {

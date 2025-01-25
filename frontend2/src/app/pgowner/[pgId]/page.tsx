@@ -46,7 +46,7 @@ export default function AddRoomPage({
 
     const fetchRooms = async () => {
       try {
-        const token = decryptToken(localStorage.getItem("authToken"));
+        const token = decryptToken(localStorage.getItem("authToken") || "");
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/pgowner/${pgId}/get-rooms`,
           {
@@ -128,7 +128,7 @@ export default function AddRoomPage({
     }
 
     try {
-      const token = decryptToken(localStorage.getItem("authToken"));
+      const token = decryptToken(localStorage.getItem("authToken") || "");
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/pgowner/add-room`,
         {

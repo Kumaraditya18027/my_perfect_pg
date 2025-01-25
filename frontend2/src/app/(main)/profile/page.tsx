@@ -145,7 +145,7 @@ export default function ProfilePage() {
   // Handle edit profile
   const handleSubmitProfile = async () => {
     try {
-      const token = decryptToken(localStorage.getItem("authToken"));
+      const token = decryptToken(localStorage.getItem("authToken") || "");
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/customer/edit-profile`,

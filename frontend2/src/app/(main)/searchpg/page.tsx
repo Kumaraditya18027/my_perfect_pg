@@ -180,7 +180,7 @@ const PGShowcase = () => {
   useEffect(() => {
     const fetchPgs = async () => {
       try {
-        const token = decryptToken(localStorage.getItem("authToken"));
+        const token = decryptToken(localStorage.getItem("authToken") || "");
 
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/customer/get-all-pgs`,
@@ -316,7 +316,7 @@ const PGShowcase = () => {
         return;
       }
 
-      const token = decryptToken(localStorage.getItem("authToken"));
+      const token = decryptToken(localStorage.getItem("authToken") || "");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/customer/bookmark-pg`,
         {

@@ -194,7 +194,7 @@ const OwnerDetailsForm = () => {
     // console.log("Data to be submitted:", Array.from(formDataToSend.entries())); // Debugging
 
     try {
-      const token = decryptToken(localStorage.getItem("authToken"));
+      const token = decryptToken(localStorage.getItem("authToken") || "");
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/pgowner/add-pg`,
@@ -269,7 +269,7 @@ const OwnerDetailsForm = () => {
   //         method: "POST",
   //         headers: {
   //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+  //           Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
   //         },
   //         body: JSON.stringify(submissionData),
   //       }

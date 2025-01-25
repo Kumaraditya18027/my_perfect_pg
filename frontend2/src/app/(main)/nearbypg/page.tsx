@@ -150,7 +150,7 @@ const PGListing = () => {
       // Fetch PGs near the user's location
       const fetchPGsNearby = async () => {
         try {
-          const token = decryptToken(localStorage.getItem("authToken"));
+          const token = decryptToken(localStorage.getItem("authToken") || "");
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/customer/get-nearby-pg?lat=${userLocation.latitude}&long=${userLocation.longitude}`,
             {
