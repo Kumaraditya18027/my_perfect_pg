@@ -6,7 +6,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { encryptToken } from "@/utils/secureToken";
 
 interface AuthContextType {
-  currentUserData: object | null;
+  currentUserData: {
+    name: string;
+    email: string;
+    bio: string;
+    phone: string;
+    avatar: string;
+    bookmarkedPg: Array<{
+      name: string;
+      address: string;
+      price: string;
+      rating: string;
+      pictures: string[];
+    }>;
+  } | null;
+
   login: (token: string, userType: string, userData: object) => void;
   logout: () => void;
   editUserData: (userData: object) => void;
@@ -19,15 +33,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [currentUserData, setCurrentUserData] = useState<object>({});
+  const [currentUserData, setCurrentUserData] =
+    useState<AuthContextType["currentUserData"]>(null);
 
   const login = (token: string, userType: string, userData: object) => {
     if (token && userType) {
       localStorage.setItem("authToken", encryptToken(token));
-      localStorage.setItem("isLoggedIn", true);
+      localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("loggedInUserType", userType);
       console.log("User data : ", userData);
-      setCurrentUserData(userData);
+      setCurrentUserData(
+        userData as {
+          name: string;
+          email: string;
+          bio: string;
+          phone: string;
+          avatar: string;
+          bookmarkedPg: {
+            name: string;
+            address: string;
+            price: string;
+            rating: string;
+            pictures: string[];
+          }[];
+        }
+      );
 
       if (userType === "Admin") {
         console.log("Going to admin page...");
@@ -54,7 +84,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const editUserData = (userData: object) => {
-    setCurrentUserData(userData);
+    setCurrentUserData(
+      userData as {
+        name: string;
+        email: string;
+        bio: string;
+        phone: string;
+        avatar: string;
+        bookmarkedPg: {
+          name: string;
+          address: string;
+          price: string;
+          rating: string;
+          pictures: string[];
+        }[];
+      }
+    );
   };
 
   return (

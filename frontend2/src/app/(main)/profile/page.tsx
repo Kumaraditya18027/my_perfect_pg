@@ -118,7 +118,7 @@ export default function ProfilePage() {
             <textarea
               name="bio"
               defaultValue={user.bio}
-              rows="3"
+              rows={3}
               className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
           </div>

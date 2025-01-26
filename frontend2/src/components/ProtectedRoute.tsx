@@ -20,13 +20,13 @@ const ProtectedRoute = ({
     // console.log("Required user type", userType);
     const loggedInUserType = localStorage.getItem("loggedInUserType");
     // console.log("Logged in user type", loggedInUserType);
-    if (!isLoggedIn || loggedInUserType !== userType) {
+    if (isLoggedIn !== "true" || loggedInUserType !== userType) {
       router.replace(`/login?next=${encodeURIComponent(pathname)}`); // Redirect unauthenticated users to the login page
       return;
     } else {
       setIsLoading(false); // Allow rendering once authenticated and user type matches
     }
-  }, [router, userType]);
+  }, [router, userType, pathname]);
 
   if (isLoading) {
     return <Loading />; // Show nothing while redirecting
