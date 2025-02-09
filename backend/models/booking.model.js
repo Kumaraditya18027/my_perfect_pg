@@ -19,7 +19,7 @@ const bookingSchema = new mongoose.Schema(
     },
     foodingType: {
       type: String,
-      enum: ["veg", "non-veg"],
+      enum: ["veg", "non-veg", "N/A"],
       required: true,
     },
     ac: {

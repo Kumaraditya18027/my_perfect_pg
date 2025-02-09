@@ -6,7 +6,6 @@ const {
   logoutUser,
 } = require("../controllers/user/auth.controller");
 const {
-  createBooking,
   getAllBookings,
   getAllPgsListed,
   getPgVerifyRequests,
@@ -36,8 +35,7 @@ router
 router.route("/admin/toggle-pgVerfication").post(authHandler(), toggleVerifyPg);
 
 //pg bookings
-router.route("/admin/create-booking").post(authHandler(), createBooking);
-router.route("/admin/get-all-bookings").post(authHandler(), getAllBookings);
+router.route("/admin/get-all-bookings").get(authHandler(), getAllBookings);
 router
   .route("/admin/update-bookingStatus")
   .patch(authHandler(), updateBookingStatus);

@@ -18,6 +18,7 @@ const pgSchema = new mongoose.Schema(
       type: String,
       enum: ["male", "female", "unisex"],
       required: true,
+      index: true,
     },
     rooms: [
       {
@@ -41,11 +42,10 @@ const pgSchema = new mongoose.Schema(
       },
     ],
     services: {
-      fooding: { type: Boolean, required: true },
+      fooding: { type: Boolean },
       foodingType: {
         type: [String],
         enum: ["veg", "non-veg", "Both"],
-        required: true,
       },
       ac: { type: Boolean },
       cctv: { type: Boolean },

@@ -11,28 +11,28 @@ const {
   editPg,
   removePg,
   getPg,
-} = require("../controllers/pgowner/pg.controller.js");
-const {
   getAllBookings,
-  updateBookingStatus,
-} = require("../controllers/admin/pg.controller.js");
+  addRoom,
+  getRooms,
+} = require("../controllers/pgowner/pg.controller.js");
 
 //authentication
 router.route("/user-login").post(loginUser);
-router.route("/user-logout").post(authHandler, logoutUser);
+router.route("/user-logout").post(authHandler(), logoutUser);
 
 //pg
 router
   .route("/pgowner/add-pg")
-  .post(authHandler, upload.array("pictures", 10), addPg);
-router.route("/pgowner/edit-pg").patch(authHandler, editPg);
-router.route("/pgowner/remove-pg").delete(authHandler, removePg);
-router.route("/pgowner/get-pg").get(authHandler, getPg);
+  .post(authHandler(), upload.array("pictureFiles"), addPg);
+router.route("/pgowner/edit-pg").patch(authHandler(), editPg);
+router.route("/pgowner/remove-pg").delete(authHandler(), removePg);
+router.route("/pgowner/get-pg").get(authHandler(), getPg);
+router
+  .route("/pgowner/add-room")
+  .post(authHandler(), upload.array("pictureFiles"), addRoom);
+router.route("/pgowner/:pgId/get-rooms").get(authHandler(), getRooms);
 
 //pg booking
-router.route("/pgowner/get-all-bookings").post(authHandler(), getAllBookings);
-router
-  .route("/pgowner/update-bookingStatus")
-  .patch(authHandler(), updateBookingStatus);
+router.route("/pgowner/get-all-bookings").get(authHandler(), getAllBookings);
 
 module.exports = router;

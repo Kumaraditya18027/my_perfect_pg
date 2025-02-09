@@ -107,20 +107,21 @@ const loginUser = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateTokens(user._id);
 
   //fetching logged in user
-  const loggedInUser = await User.findById(user._id).select(
-    "-_id -password -refreshToken"
-  );
+  const loggedInUser = await User.findById(user._id)
+    .select("uuid name username email address phone avatar bio bookmarkedPg")
+    .populate("bookmarkedPg", "name address rating pictures");
 
   //configuring cookie options
   const options = {
     httpOnly: true,
     secure: false,
+    sameSite: "Strict", // Prevents CSRF attacks
     expires: new Date(Date.now() + 60 * 60 * 24 * 1000),
+    path: "/",
   };
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
     .json(
       new ResponseHandler(201, "User logged in successfully", {

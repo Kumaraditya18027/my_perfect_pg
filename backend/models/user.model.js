@@ -22,6 +22,9 @@ const userSchema = new mongoose.Schema(
       unique: true,
       validate: [validator.isEmail, "Enter an valid email"],
     },
+    address: { type: String },
+    phone: { type: String },
+    avatar: { type: String },
     password: {
       type: String,
       required: true,
@@ -32,6 +35,13 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "customer", "pgowner", "employee"],
       default: "customer",
     },
+    bio: { type: String },
+    bookmarkedPg: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Pg",
+      },
+    ],
     refreshToken: { type: String },
   },
   { timestamps: true }

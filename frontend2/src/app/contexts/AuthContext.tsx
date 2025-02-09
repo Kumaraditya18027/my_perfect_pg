@@ -2,12 +2,28 @@
 "use client";
 
 import React, { createContext, useContext, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { encryptToken } from "@/utils/secureToken";
 
 interface AuthContextType {
-  isAuthenticated: boolean;
-  login: (token: string, userType: string) => void;
+  currentUserData: {
+    name: string;
+    email: string;
+    bio: string;
+    phone: string;
+    avatar: string;
+    bookmarkedPg: Array<{
+      name: string;
+      address: string;
+      price: string;
+      rating: string;
+      pictures: string[];
+    }>;
+  } | null;
+
+  login: (token: string, userType: string, userData: object) => void;
   logout: () => void;
+  editUserData: (userData: object) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,17 +32,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const searchParams = useSearchParams();
+  const [currentUserData, setCurrentUserData] =
+    useState<AuthContextType["currentUserData"]>(null);
 
-  const login = (token: string, userType: string) => {
+  const login = (token: string, userType: string, userData: object) => {
     if (token && userType) {
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("isLoggedIn", true);
-      setIsAuthenticated(true);
+      localStorage.setItem("authToken", encryptToken(token));
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("loggedInUserType", userType);
+      console.log("User data : ", userData);
+      setCurrentUserData(
+        userData as {
+          name: string;
+          email: string;
+          bio: string;
+          phone: string;
+          avatar: string;
+          bookmarkedPg: {
+            name: string;
+            address: string;
+            price: string;
+            rating: string;
+            pictures: string[];
+          }[];
+        }
+      );
 
       if (userType === "Admin") {
         console.log("Going to admin page...");
-        router.push("/admin");
+        router.push("/admin/summary");
         return;
       } else if (userType === "Owner") {
         console.log("Going to owner page...");
@@ -34,7 +69,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       } else {
         console.log("Going to user search page...");
-        router.push("/searchpg");
+        const nextPath = searchParams.get("next") || "/searchpg";
+        router.replace(nextPath);
         return;
       }
     }
@@ -42,12 +78,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = () => {
     localStorage.removeItem("authToken");
-    setIsAuthenticated(false);
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("loggedInUserType");
     router.push("/login");
   };
 
+  const editUserData = (userData: object) => {
+    setCurrentUserData(
+      userData as {
+        name: string;
+        email: string;
+        bio: string;
+        phone: string;
+        avatar: string;
+        bookmarkedPg: {
+          name: string;
+          address: string;
+          price: string;
+          rating: string;
+          pictures: string[];
+        }[];
+      }
+    );
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ currentUserData, login, logout, editUserData }}
+    >
       {children}
     </AuthContext.Provider>
   );

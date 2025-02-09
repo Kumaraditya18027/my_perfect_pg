@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { decryptToken } from "@/utils/secureToken";
 
 // SVG Icons as components
 const MenuIcon = () => (
@@ -42,30 +43,22 @@ const CloseIcon = () => (
 );
 
 const Navbar = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("isLoggedIn")
-  );
   const { logout } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
-  // const logout = () => {
-  //   setIsLoggedIn((prev) => !prev);
-  //   localStorage.setItem("isLoggedIn", false);
-  //   router.push("/");
-  // };
-
   const handleLogout = async () => {
-    // e.preventDefault();
-
     try {
+      const token = decryptToken(localStorage.getItem("authToken") || "");
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-logout`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -75,7 +68,6 @@ const Navbar = () => {
       }
 
       await response.json();
-      // console.log(data);
       logout();
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -109,8 +101,8 @@ const Navbar = () => {
             <NavLink href="/about">About Us</NavLink>
             <NavLink href="/searchpg">Search</NavLink>
             <NavLink href="/nearbypg">Nearby PGs</NavLink>
-            {/* <NavLink href="/Summary">Dashboard</NavLink> */}
-            {isLoggedIn ? (
+            <NavLink href="/profile">Profile</NavLink>
+            {localStorage.getItem("isLoggedIn") ? (
               <button
                 onClick={logout}
                 className="px-4 py-2 rounded-full bg-blue-500 text-white font-medium 
@@ -167,16 +159,29 @@ const Navbar = () => {
             {/* <MobileNavLink href="/about" onClick={() => setIsOpen(false)}>
               About
             </MobileNavLink> */}
-            <button
-              onClick={handleLogout}
-              className="block w-full text-center px-4 py-2 mt-4 rounded-full 
+            {localStorage.getItem("loggedIn") ? (
+              <button
+                onClick={handleLogout}
+                className="block w-full text-center px-4 py-2 mt-4 rounded-full 
                          bg-blue-500 text-white font-medium 
                          transform transition-all duration-300 
                          hover:bg-blue-600 hover:scale-105
                          active:scale-95"
-            >
-              Logout
-            </button>
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push("/login")}
+                className="block w-full text-center px-4 py-2 mt-4 rounded-full 
+                         bg-blue-500 text-white font-medium 
+                         transform transition-all duration-300 
+                         hover:bg-blue-600 hover:scale-105
+                         active:scale-95"
+              >
+                Login
+              </button>
+            )}
           </div>
         </div>
       </div>
