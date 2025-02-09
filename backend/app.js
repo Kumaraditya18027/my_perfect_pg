@@ -10,6 +10,7 @@ const testRouter = require("./routes/test.route");
 const adminRouter = require("./routes/admin.route");
 const customerRouter = require("./routes/customer.route");
 const pgownerRouter = require("./routes/pgowner.route");
+const employeeRouter = require("./routes/employee.route");
 
 const app = express();
 
@@ -35,9 +36,10 @@ app.use(cookieParser());
 
 //routes
 app.use("/api/v1", userRouter);
-app.use("/api/v1", adminRouter);
+app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1", customerRouter);
 app.use("/api/v1", pgownerRouter);
+app.use("/api/v1/employee", employeeRouter);
 app.use("/test", testRouter);
 
 //errors handler
