@@ -44,12 +44,12 @@ const LoginPage: React.FC = () => {
       const data = await response.json();
       // console.log(data);
       login(data.data.accessToken, formData.userType, data.data.user);
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
     }
   };
 
-  const userTypes: string[] = ["Student", "Owner", "Admin"];
+  const userTypes: string[] = ["Student", "Owner", "Employee", "Admin"];
 
   return (
     <>
@@ -138,6 +138,18 @@ const LoginPage: React.FC = () => {
                 Don&apos;t have an account yet?{" "}
                 <Link
                   href="/register"
+                  prefetch={true}
+                  className="text-blue-600"
+                >
+                  Register here
+                </Link>
+              </p>
+            )}
+            {formData.userType === "Owner" && (
+              <p className="my-2 text-white">
+                Don&apos;t have an account yet?{" "}
+                <Link
+                  href="/register/pgowner"
                   prefetch={true}
                   className="text-blue-600"
                 >
