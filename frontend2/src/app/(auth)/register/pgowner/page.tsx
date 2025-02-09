@@ -3,35 +3,45 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import HomeNavbar from "@/components/HomeNavbar";
+import toast from "react-hot-toast";
 
-interface FormData {
+// Rename your custom type to avoid conflicts with the built-in FormData
+interface RegistrationFormData {
   name: string;
   email: string;
-  password: string;
+  phone: string;
+  adhaarFile: File | null;
 }
 
-const RegisterPage: React.FC = () => {
+const PGOwnerRegisterPage: React.FC = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<RegistrationFormData>({
     name: "",
     email: "",
-    password: "",
+    phone: "",
+    adhaarFile: null,
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
     try {
       setLoading(true);
+
+      // Create a FormData instance
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("email", formData.email);
+      data.append("phone", formData.phone);
+      if (formData.adhaarFile) {
+        data.append("adhaarFile", formData.adhaarFile);
+      }
+
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-register`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/pgowner-register`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
+          body: data,
         }
       );
 
@@ -41,10 +51,16 @@ const RegisterPage: React.FC = () => {
       }
 
       await response.json();
-      // console.log("Registration successful:", data.data);
 
-      // Redirect to desired page after registration
-      router.push("/login");
+      // Show a toast notification
+      toast.success(
+        "Registered successfully! Check your mail for login credentials."
+      );
+
+      // Optionally, delay redirect to allow the toast to be visible
+      setTimeout(() => {
+        router.push("/login");
+      }, 3000); // Redirect after 3 seconds
     } catch (err) {
       setError(err.message);
       console.error("Error during registration:", err);
@@ -65,13 +81,12 @@ const RegisterPage: React.FC = () => {
       <div
         className="absolute top-0 left-0 w-full z-50 backdrop-blur-md"
         style={{
-          backgroundImage: `
-            linear-gradient(to right, rgba(0, 0, 0, 0.7) 100%, rgba(0, 0, 0, 0.4) 100%, rgba(0, 0, 0, 0) 100%)
-          `,
+          backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.7) 100%, rgba(0, 0, 0, 0.4) 100%, rgba(0, 0, 0, 0) 100%)`,
         }}
       >
         <HomeNavbar />
       </div>
+
       {/* Main Background */}
       <div
         className="min-h-screen flex items-start justify-center md:justify-start relative"
@@ -95,9 +110,7 @@ const RegisterPage: React.FC = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white 
-                          placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 
-                          focus:ring-opacity-20 outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 outline-none transition-colors"
                 placeholder="Enter your name"
                 required
               />
@@ -110,25 +123,36 @@ const RegisterPage: React.FC = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                className="w-full px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white 
-                          placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 
-                          focus:ring-opacity-20 outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 outline-none transition-colors"
                 placeholder="Enter your email"
                 required
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-gray-300">Password</label>
+              <label className="text-sm text-gray-300">Phone Number</label>
               <input
-                type="password"
-                value={formData.password}
+                type="text"
+                value={formData.phone}
                 onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
+                  setFormData({ ...formData, phone: e.target.value })
                 }
-                className="w-full px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white 
-                          placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 
-                          focus:ring-opacity-20 outline-none transition-colors"
-                placeholder="Enter your password"
+                className="w-full px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 outline-none transition-colors"
+                placeholder="Enter your phone number"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm text-gray-300">Adhaar</label>
+              <input
+                type="file"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    adhaarFile: e.target.files ? e.target.files[0] : null,
+                  })
+                }
+                className="w-full px-4 py-3 rounded-lg bg-gray-900/50 border border-gray-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-20 outline-none transition-colors"
+                accept=".pdf"
                 required
               />
             </div>
@@ -136,8 +160,7 @@ const RegisterPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg 
-                transition-colors font-medium shadow-lg hover:shadow-blue-500/20"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-colors font-medium shadow-lg hover:shadow-blue-500/20"
             >
               {loading ? "Registering..." : "Register"}
             </button>
@@ -148,4 +171,4 @@ const RegisterPage: React.FC = () => {
   );
 };
 
-export default RegisterPage;
+export default PGOwnerRegisterPage;
