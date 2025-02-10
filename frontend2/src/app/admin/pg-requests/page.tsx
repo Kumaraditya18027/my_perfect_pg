@@ -31,7 +31,7 @@ function PgVerificationRequests() {
         const data = await response.json();
         setPgRequests(data?.data || []);
         setLoading(false);
-      } catch (err: any) {
+      } catch (err) {
         setError(err.message);
         setLoading(false);
       }
@@ -63,7 +63,7 @@ function PgVerificationRequests() {
       // Refresh the PG list after verification
       setPgRequests((prev) => prev.filter((pg) => pg.uuid !== pgId));
       alert("PG verified successfully!");
-    } catch (err: any) {
+    } catch (err) {
       alert(err.message);
     }
   };

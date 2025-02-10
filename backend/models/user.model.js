@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema(
     },
     address: { type: String },
     phone: { type: String },
+    adhaar: { type: String },
     avatar: { type: String },
     password: {
       type: String,
@@ -42,9 +43,10 @@ const userSchema = new mongoose.Schema(
         ref: "Pg",
       },
     ],
+    isPGOwnerVerified: { type: Boolean, default: false },
     refreshToken: { type: String },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 userSchema.pre("save", async function (next) {

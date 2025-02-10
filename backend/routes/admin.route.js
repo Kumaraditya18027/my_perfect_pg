@@ -17,6 +17,8 @@ const {
   addUser,
   removeUser,
   editUser,
+  getAllPgOwners,
+  verifyPGOwner,
 } = require("../controllers/admin/user.controller.js");
 
 //authentication
@@ -27,21 +29,21 @@ router.route("/admin-logout").post(authHandler(), logoutUser);
 router.route("/add-user").post(authHandler(), addUser);
 router.route("/remove-user").delete(authHandler(), removeUser);
 router.route("/edit-user").patch(authHandler(), editUser);
+router.route("/get-pgowners").get(authHandler(), getAllPgOwners);
+router.route("/verify-pgowner").patch(authHandler(), verifyPGOwner);
 
 //pg verification
 router
-  .route("/admin/get-pgVerification-requests")
+  .route("/get-pgVerification-requests")
   .get(authHandler(), getPgVerifyRequests);
-router.route("/admin/toggle-pgVerfication").post(authHandler(), toggleVerifyPg);
+router.route("/toggle-pgVerfication").post(authHandler(), toggleVerifyPg);
 
 //pg bookings
-router.route("/admin/get-all-bookings").get(authHandler(), getAllBookings);
-router
-  .route("/admin/update-bookingStatus")
-  .patch(authHandler(), updateBookingStatus);
+router.route("/get-all-bookings").get(authHandler(), getAllBookings);
+router.route("/update-bookingStatus").patch(authHandler(), updateBookingStatus);
 
 //pg operation
-router.route("/admin/get-all-pgs").get(authHandler(), getAllPgsListed);
-router.route("/admin/remove-pg").delete(authHandler(), removePg);
+router.route("/get-all-pgs").get(authHandler(), getAllPgsListed);
+router.route("/remove-pg").delete(authHandler(), removePg);
 
 module.exports = router;

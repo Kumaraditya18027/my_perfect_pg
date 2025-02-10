@@ -127,7 +127,7 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
         throw new Error("Failed to request book PG.");
       }
 
-      const data = await response.json();
+      await response.json();
       // console.log(data);
       setBookingStatus((prev) => [...prev, roomType]);
       setLoading(false);

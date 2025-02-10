@@ -1,7 +1,11 @@
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 //local imports
-const { ApiError } = require("../../utils/customErrorHandler");
+const {
+  ApiError,
+  ValidationError,
+  NotFoundError,
+} = require("../../utils/customErrorHandler");
 const ResponseHandler = require("../../utils/responseHandler");
 const asyncHandler = require("../../utils/asyncHandler");
 const User = require("../../models/user.model");
@@ -86,6 +90,9 @@ const loginUser = asyncHandler(async (req, res) => {
     case "Owner":
       role = "pgowner";
       break;
+    case "Employee":
+      role = "employee";
+      break;
     default:
       role = "";
       break;
@@ -101,6 +108,11 @@ const loginUser = asyncHandler(async (req, res) => {
   const isPasswordValid = await user.isValidPassword(password);
   if (!isPasswordValid) {
     throw new ApiError(409, "Invalid user login credentials");
+  }
+
+  //checking if pgowner is verified or not
+  if (role === "pgowner" && !user.isPGOwnerVerified) {
+    throw new NotFoundError("User not found!");
   }
 
   //generate tokens

@@ -7,6 +7,7 @@ const {
 } = require("../../utils/customErrorHandler");
 const ResponseHandler = require("../../utils/responseHandler");
 const { v4: uuidv4 } = require("uuid");
+const nodemailer = require("nodemailer");
 
 //add user (pgowner/employee/user)
 const addUser = asyncHandler(async (req, res) => {
@@ -52,6 +53,99 @@ const addUser = asyncHandler(async (req, res) => {
     .json(
       new ResponseHandler(201, `User - ${user.role} added successfully`, user)
     );
+});
+
+//get unverified pgowner list
+const getAllPgOwners = asyncHandler(async (req, res) => {
+  const users = await User.find({ role: "pgowner" }).select("-_id");
+
+  if (!users || users.length === 0) {
+    return res
+      .status(200)
+      .json(new ResponseHandler(200, "No PG Owners available currently!"));
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ResponseHandler(200, "PG owners list fetched successfully!", users)
+    );
+});
+
+//verify pgowner
+const verifyPGOwner = asyncHandler(async (req, res) => {
+  const { userId, username, password } = req.body;
+  const verificationBodyId = req.user._id;
+
+  if (!verificationBodyId || !userId || !username || !password) {
+    throw new ApiError(
+      400,
+      "Admin ID, User ID, username, and password are required!"
+    );
+  }
+
+  // Find the user by ID
+  const user = await User.findOne({ uuid: userId });
+  if (!user) {
+    throw new NotFoundError("User not found!");
+  }
+
+  // Ensure the user is a PG owner
+  if (user.role !== "pgowner") {
+    throw new ApiError(400, "User is not a PG owner!");
+  }
+
+  // Ensure verification body is either employee or admin
+  const verificationBody = await User.findById(verificationBodyId);
+  console.log(verificationBody.role);
+  if (!["admin", "employee"].includes(verificationBody.role)) {
+    throw new ApiError(400, "You must be an Admin or Employee!");
+  }
+
+  // Set username, hashed password, and mark the PG owner as verified
+  user.username = username;
+  user.password = password;
+  user.isPGOwnerVerified = true;
+  await user.save();
+
+  // Create a Nodemailer transporter using environment variables
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: process.env.SMTP_SECURE === "true",
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  // Define the email options
+  const mailOptions = {
+    from: process.env.SMTP_FROM,
+    to: user.email,
+    subject: "Your PG Owner Account is Verified",
+    text: `Dear ${user.name},
+
+Your PG Owner account has been verified successfully.
+
+Your login details are:
+  Username: ${username}
+  Password: ${password}
+
+Please keep these details secure and change your password after logging in.
+
+Thank you,
+Team MyPerfectPG`,
+  };
+
+  // Send the email
+  await transporter.sendMail(mailOptions);
+
+  // Respond with success
+  res.status(200).json({
+    message: "PG owner verified successfully and email sent.",
+    user,
+  });
 });
 
 //remove user (pgowner/employee/user)
@@ -150,4 +244,6 @@ module.exports = {
   addUser,
   removeUser,
   editUser,
+  verifyPGOwner,
+  getAllPgOwners,
 };

@@ -15,8 +15,12 @@ const {
   addRoom,
   getRooms,
 } = require("../controllers/pgowner/pg.controller.js");
+const { registerUser } = require("../controllers/pgowner/auth.controller.js");
 
 //authentication
+router
+  .route("/pgowner-register")
+  .post(upload.single("adhaarFile"), registerUser);
 router.route("/user-login").post(loginUser);
 router.route("/user-logout").post(authHandler(), logoutUser);
 
