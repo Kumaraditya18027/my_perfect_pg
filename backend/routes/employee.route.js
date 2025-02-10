@@ -27,7 +27,7 @@ router.route("/get-pgowners").get(authHandler(), getAllPgOwners);
 router.route("/verify-pgowner").patch(authHandler(), verifyPGOwner);
 
 //manage employees
-router.route("/get-employee").get(authHandler(), getEmployees);
+router.route("/get-employees").get(authHandler(), getEmployees);
 router.route("/assign-employee").patch(authHandler(), assignEmployee);
 
 //pg verification

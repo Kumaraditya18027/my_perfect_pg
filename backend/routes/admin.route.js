@@ -33,7 +33,7 @@ router.route("/remove-user").delete(authHandler(), removeUser);
 router.route("/edit-user").patch(authHandler(), editUser);
 router.route("/get-pgowners").get(authHandler(), getAllPgOwners);
 router.route("/verify-pgowner").patch(authHandler(), verifyPGOwner);
-router.route("/get-employee").get(authHandler(), getEmployees);
+router.route("/get-employees").get(authHandler(), getEmployees);
 router.route("/assign-employee").patch(authHandler(), assignEmployee);
 
 //pg verification
