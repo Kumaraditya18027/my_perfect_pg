@@ -121,7 +121,8 @@ const getAllBookings = asyncHandler(async (req, res) => {
   // Fetch bookings based on the query
   const bookings = await Booking.find(query)
     .populate("user", "name email phone")
-    .populate("pg", "name address gender pictures");
+    .populate("pg", "name address gender pictures")
+    .populate("assignedMember", "_id name uuid");
 
   if (bookings.length === 0) {
     return res.status(200).json(new ResponseHandler(200, "No bookings found."));
