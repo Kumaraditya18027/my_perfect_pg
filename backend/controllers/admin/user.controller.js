@@ -1,4 +1,5 @@
 const User = require("../../models/user.model");
+const Booking = require("../../models/booking.model");
 const asyncHandler = require("../../utils/asyncHandler");
 const {
   ValidationError,
@@ -55,9 +56,82 @@ const addUser = asyncHandler(async (req, res) => {
     );
 });
 
+//get employees
+const getEmployees = asyncHandler(async (req, res) => {
+  const users = await User.find({ role: "employee" }).select(
+    "-_id -password -refreshToken"
+  );
+
+  if (!users || users.length === 0) {
+    return res
+      .status(200)
+      .json(new ResponseHandler(200, "No Employee available currently!"));
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ResponseHandler(200, "Employee list fetched successfully!", users)
+    );
+});
+
+//assign employee
+const assignEmployee = asyncHandler(async (req, res) => {
+  const { bookingId, employeeId } = req.body;
+  const assignedBy = req.user._id;
+
+  if (!bookingId || !employeeId || !assignedBy) {
+    throw new ApiError(400, "All fields are required!");
+  }
+
+  // Verify that the user performing the assignment has a valid role (admin or employee)
+  const verificationBody = await User.findOne({
+    _id: assignedBy,
+    role: { $in: ["admin", "employee"] },
+  }).select("_id uuid role name");
+
+  if (!verificationBody) {
+    throw new NotFoundError(
+      "Assignee (assigning user) not found or invalid role!"
+    );
+  }
+
+  // Verify that the employee exists and is valid
+  const employee = await User.findOne({ uuid: employeeId }).select("_id role");
+  if (!employee || !["employee", "admin"].includes(employee.role)) {
+    throw new NotFoundError("Employee not found or invalid role!");
+  }
+
+  // Find the booking by ID
+  const booking = await Booking.findById(bookingId);
+  if (!booking) {
+    throw new NotFoundError("Booking not found!");
+  }
+
+  // Update the booking with the assigned employee details
+  booking.assignedMember = employee._id;
+  booking.assignedBy = verificationBody._id;
+  booking.status = "assigned";
+
+  await booking.save();
+
+  // Optionally, populate assignedMember and assignedBy for a detailed response
+  const updatedBooking = await Booking.findById(bookingId)
+    .populate("assignedMember", "name email")
+    .populate("assignedBy", "name email");
+
+  return res
+    .status(200)
+    .json(
+      new ResponseHandler(200, "Employee assigned successfully", updatedBooking)
+    );
+});
+
 //get unverified pgowner list
 const getAllPgOwners = asyncHandler(async (req, res) => {
-  const users = await User.find({ role: "pgowner" }).select("-_id");
+  const users = await User.find({ role: "pgowner" }).select(
+    "-_id -password -refreshToken"
+  );
 
   if (!users || users.length === 0) {
     return res
@@ -246,4 +320,6 @@ module.exports = {
   editUser,
   verifyPGOwner,
   getAllPgOwners,
+  getEmployees,
+  assignEmployee,
 };
