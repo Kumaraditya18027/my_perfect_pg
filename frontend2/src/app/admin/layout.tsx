@@ -9,7 +9,7 @@ export default function AdminLayout({
 }>) {
   return (
     <ProtectedRoute userType="Admin">
-      <Sidebar />
+      <Sidebar type="admin" />
       <main className="pl-40 pr-10 py-20">{children}</main>
     </ProtectedRoute>
   );
