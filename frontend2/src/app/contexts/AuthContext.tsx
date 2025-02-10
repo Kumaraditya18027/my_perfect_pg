@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       } else if (userType === "Employee") {
         console.log("Going to employee page...");
-        router.push("/admin/summary");
+        router.push("/employee/summary");
         return;
       } else {
         console.log("Going to user search page...");

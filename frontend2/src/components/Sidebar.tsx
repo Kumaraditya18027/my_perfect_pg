@@ -1,12 +1,13 @@
 "use client";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { decryptToken } from "@/utils/secureToken";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { FaChartBar, FaBox, FaCog, FaSignOutAlt } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 
-const Sidebar = () => {
+const Sidebar = ({ type }: { type: string }) => {
   const router = useRouter();
   const [activeIcon, setActiveIcon] = useState("summary");
   const { logout } = useAuth();
@@ -32,7 +33,7 @@ const Sidebar = () => {
 
       await response.json();
       logout();
-    } catch (err: any) {
+    } catch (err) {
       console.log(err.message || "Something went wrong. Please try again.");
       toast.success("Logout failed!", {
         position: "top-right",
@@ -52,7 +53,7 @@ const Sidebar = () => {
       return;
     } else {
       setActiveIcon(iconName);
-      router.push(`/admin/${iconName}`);
+      router.push(`/${type}/${iconName}`);
     }
   };
 
@@ -80,9 +81,11 @@ const Sidebar = () => {
           className="w-12 h-12 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-label="User profile"
         >
-          <img
-            src="https://th.bing.com/th/id/OIP.7G6XwS4BzQWHQl-VoyvCFgHaHa?rs=1&pid=ImgDetMain" // Replace with actual profile picture URL
+          <Image
+            src="https://th.bing.com/th/id/OIP.7G6XwS4BzQWHQl-VoyvCFgHaHa?rs=1&pid=ImgDetMain"
             alt="Profile"
+            width={500}
+            height={500}
             className="w-full h-full object-cover"
           />
         </button>
