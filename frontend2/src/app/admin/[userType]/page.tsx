@@ -1,10 +1,12 @@
 "use client";
 
 import { decryptToken } from "@/utils/secureToken";
+import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
-function PgOwners() {
+function Users() {
+  const { userType } = useParams();
   const [pgOwners, setPgOwners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,12 +21,14 @@ function PgOwners() {
   const [isSubmissionLoading, setSubmissionLoading] = useState(false);
 
   useEffect(() => {
+    console.log(userType);
+
     const fetchPgRequests = async () => {
       try {
         const token = decryptToken(localStorage.getItem("authToken") || "");
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/get-pgowners`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/get-${userType}`,
           {
             method: "GET",
             headers: {
@@ -35,7 +39,7 @@ function PgOwners() {
         );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch PG verification requests.");
+          throw new Error(`Failed to fetch ${userType}`);
         }
 
         const data = await response.json();
@@ -48,7 +52,7 @@ function PgOwners() {
     };
 
     fetchPgRequests();
-  }, []);
+  }, [userType]);
 
   const handleVerify = async (
     ownerId: string,
@@ -114,7 +118,9 @@ function PgOwners() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-gray-800 mb-6">PG Owners</h1>
+      <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+        {userType.toLocaleString().toUpperCase()}
+      </h1>
       {/* Filter Section */}
       <div className="mb-4 flex items-center gap-4">
         <label className="font-medium text-gray-700">Filter:</label>
@@ -281,4 +287,4 @@ function PgOwners() {
   );
 }
 
-export default PgOwners;
+export default Users;
