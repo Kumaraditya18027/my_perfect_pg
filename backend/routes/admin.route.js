@@ -22,6 +22,9 @@ const {
   getEmployees,
   assignEmployee,
 } = require("../controllers/admin/user.controller.js");
+const {
+  getDashboardStats,
+} = require("../controllers/admin/dashboard.controller.js");
 
 //authentication
 router.route("/admin-login").post(loginUser);
@@ -49,5 +52,8 @@ router.route("/update-bookingStatus").patch(authHandler(), updateBookingStatus);
 //pg operation
 router.route("/get-all-pgs").get(authHandler(), getAllPgsListed);
 router.route("/remove-pg").delete(authHandler(), removePg);
+
+//dashboard
+router.route("/dashboard-stats").get(authHandler(), getDashboardStats);
 
 module.exports = router;

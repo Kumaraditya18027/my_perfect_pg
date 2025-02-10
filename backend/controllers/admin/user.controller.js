@@ -165,8 +165,8 @@ const verifyPGOwner = asyncHandler(async (req, res) => {
   }
 
   // Ensure the user is a PG owner
-  if (user.role !== "pgowner") {
-    throw new ApiError(400, "User is not a PG owner!");
+  if (user.role == "pgowner" || user.role === "employee") {
+    throw new ApiError(400, "User is not a PG owner or employee!");
   }
 
   // Ensure verification body is either employee or admin
