@@ -120,7 +120,6 @@ const Page: React.FC = () => {
             className="relative text-sm bg-gray-100 p-2 ml-4 rounded-[14px] hover:bg-gray-200"
           >
             <p>PG Owners</p>
-            <span className="absolute top-0 right-0 inline-block w-3 h-3 bg-blue-500 border-2 border-white rounded-full" />
           </Link>
 
           {/* Popup */}

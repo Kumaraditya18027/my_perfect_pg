@@ -1,6 +1,7 @@
 "use client";
 
 import { decryptToken } from "@/utils/secureToken";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 function PgVerificationRequests() {
@@ -89,9 +90,11 @@ function PgVerificationRequests() {
               className="flex items-center justify-between mt-2 py-4 px-4 bg-white rounded-md shadow-sm hover:shadow-md transition-all duration-300"
             >
               <div className="flex items-center">
-                <img
+                <Image
                   src={pg.pictures[0] || "/placeholder.jpg"}
                   alt={pg.name}
+                  width={500}
+                  height={500}
                   className="w-16 h-16 rounded-md object-cover mr-4"
                 />
                 <div>

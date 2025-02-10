@@ -14,7 +14,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 
 ChartJS.register(
   CategoryScale,
@@ -27,7 +28,6 @@ ChartJS.register(
 );
 
 const Page: React.FC = () => {
-  const router = useRouter();
   const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
 
   // Data for the charts (mock data for example purposes)
@@ -100,28 +100,33 @@ const Page: React.FC = () => {
         <h1 className="text-2xl font-semibold">Summary</h1>
 
         {/* Popup button and handling */}
-        <div className="relative">
-          <button
-            onClick={() => setPopupOpen(!isPopupOpen)}
+        <div className="relative flex gap-x-3">
+          <Link
+            href="/admin/new-booking-request"
             className="relative text-sm bg-gray-100 p-2 rounded-[14px] hover:bg-gray-200"
           >
             <p>New Booking</p>
             <span className="absolute top-0 right-0 inline-block w-3 h-3 bg-blue-500 border-2 border-white rounded-full" />
-          </button>
-          <button
-            onClick={() => router.push("/admin/pg-requests")}
+          </Link>
+          <Link
+            href="/admin/pg-requests"
             className="relative text-sm bg-gray-100 p-2 ml-4 rounded-[14px] hover:bg-gray-200"
           >
             <p>New PG Request</p>
             <span className="absolute top-0 right-0 inline-block w-3 h-3 bg-blue-500 border-2 border-white rounded-full" />
-          </button>
-          <button
-            onClick={() => router.push("/admin/pgowners")}
+          </Link>
+          <Link
+            href="/admin/employees"
+            className="relative text-sm bg-gray-100 p-2 ml-4 rounded-[14px] hover:bg-gray-200"
+          >
+            <p>Employees</p>
+          </Link>
+          <Link
+            href="/admin/pgowners"
             className="relative text-sm bg-gray-100 p-2 ml-4 rounded-[14px] hover:bg-gray-200"
           >
             <p>PG Owners</p>
-            <span className="absolute top-0 right-0 inline-block w-3 h-3 bg-blue-500 border-2 border-white rounded-full" />
-          </button>
+          </Link>
 
           {/* Popup */}
           {isPopupOpen && (
@@ -141,7 +146,13 @@ const Page: React.FC = () => {
                   </button>
                 </div>
                 <div className="flex">
-                  <img src="/PgImage.png" alt="PgImage" className="w-16 h-16" />
+                  <Image
+                    src="/PgImage.png"
+                    alt="PgImage"
+                    width={500}
+                    height={500}
+                    className="w-16 h-16"
+                  />
                   <div className="ml-2 flex flex-col">
                     <h2 className="text-xl font-semibold">Bla Bla PG</h2>
                     <span className="flex">
