@@ -6,6 +6,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import HomeNavbar from "@/components/HomeNavbar";
 import toast from "react-hot-toast";
+import { Suspense } from "react";
+
+const Page = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PGOwnerRegisterPage />
+    </Suspense>
+  );
+};
 
 interface RegistrationFormData {
   name: string;
@@ -172,4 +181,4 @@ const PGOwnerRegisterPage: React.FC = () => {
   );
 };
 
-export default PGOwnerRegisterPage;
+export default Page;
