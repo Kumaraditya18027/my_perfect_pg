@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import HomeNavbar from "@/components/HomeNavbar";
 import toast from "react-hot-toast";
 
-// Rename your custom type to avoid conflicts with the built-in FormData
 interface RegistrationFormData {
   name: string;
   email: string;

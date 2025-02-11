@@ -19,10 +19,11 @@ const LoginPage: React.FC = () => {
     userType: "Student",
   });
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/user-login`,
@@ -46,6 +47,8 @@ const LoginPage: React.FC = () => {
       login(data.data.accessToken, formData.userType, data.data.user);
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -128,10 +131,11 @@ const LoginPage: React.FC = () => {
             </div>
             <button
               type="submit"
+              disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg 
                 transition-colors font-medium shadow-lg hover:shadow-blue-500/20"
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
             {formData.userType === "Student" && (
               <p className="my-2 text-white">

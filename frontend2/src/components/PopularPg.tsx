@@ -24,7 +24,6 @@ const PopularPGSection = () => {
       }
 
       const data = await response.json();
-      console.log(data);
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       data.data ? setPgList(data.data) : setMessage(data.message);
     } catch (err) {
