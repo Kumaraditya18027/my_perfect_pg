@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 import React, { useEffect, useState } from "react";
 import { FaArrowRight, FaBell, FaMapMarkerAlt } from "react-icons/fa";
 import { Line } from "react-chartjs-2";

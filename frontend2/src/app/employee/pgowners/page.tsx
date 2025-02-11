@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 import { decryptToken } from "@/utils/secureToken";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
