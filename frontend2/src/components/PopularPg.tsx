@@ -3,50 +3,6 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
 const PopularPGSection = () => {
-  // Array of PG listings data
-  const pgListings = [
-    {
-      name: "Midland Park Building",
-      price: 7000,
-      image: "/midlandpark.jpg",
-    },
-    {
-      name: "Kashana Housing",
-      price: 6000,
-      image: "/kashanapg.jpg",
-    },
-    {
-      name: "Barsha PG",
-      price: 7000,
-      image: "/barshapg.jpg",
-    },
-    {
-      name: "Maa Santoshi PG",
-      price: 6500,
-      image: "/masantoshi.jpg",
-    },
-    {
-      name: "Appayan PG",
-      price: 7000,
-      image: "/appayan.jpg",
-    },
-    {
-      name: "Sabita PG",
-      price: 6800,
-      image: "/sabitapg.jpg",
-    },
-    {
-      name: "Narayan House",
-      price: 8000,
-      image: "/narayanhouse.jpg",
-    },
-    {
-      name: "Asha PG",
-      price: 7000,
-      image: "/ashapg.jpg",
-    },
-  ];
-
   const [pgList, setPgList] = useState([]);
   const [error, setError] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
@@ -71,7 +27,7 @@ const PopularPGSection = () => {
       console.log(data);
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       data.data ? setPgList(data.data) : setMessage(data.message);
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
     }
   };
@@ -83,7 +39,7 @@ const PopularPGSection = () => {
   return (
     <div className="p-8">
       <h2 className="text-4xl font-normal mb-8">Popular PG</h2>
-      <p>{error && error.message}</p>
+      <p>{error}</p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {message !== "" && <p className="text-black">{message}</p>}
         {pgList &&
