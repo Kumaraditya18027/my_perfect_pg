@@ -1,5 +1,6 @@
 "use client";
 import { decryptToken } from "@/utils/secureToken";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
@@ -16,7 +17,7 @@ type Room = {
     count: number;
     booked: number;
   };
-  pictures: string[];
+  pictures: (File | string)[];
 };
 
 export default function AddRoomPage({
@@ -179,9 +180,11 @@ export default function AddRoomPage({
                 <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {room.pictures.map((imageUrl, imageIndex) => (
                     <div key={imageIndex} className="w-full h-40">
-                      <img
-                        src={imageUrl}
+                      <Image
+                        src={(imageUrl as string) || "/logo.png"}
                         alt={`${room.type} room image ${imageIndex + 1}`}
+                        width={500}
+                        height={500}
                         className="w-full h-full object-cover rounded-lg"
                       />
                     </div>
@@ -299,7 +302,7 @@ export default function AddRoomPage({
               <ul>
                 {Array.from(newRoom.pictures).map((file, index) => (
                   <li key={index} className="text-sm">
-                    {file.name}
+                    {typeof file === "string" ? file : file.name}
                   </li>
                 ))}
               </ul>

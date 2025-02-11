@@ -66,7 +66,7 @@ const AddPg: React.FC = () => {
     if (validateForm()) {
       // Create query string from formData
       const queryString = new URLSearchParams(
-        formData as Record<string, string>
+        formData as unknown as Record<string, string>
       ).toString();
 
       // Navigate to the next page with query string
@@ -182,7 +182,7 @@ const AddPg: React.FC = () => {
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                rows="4"
+                rows={4}
                 className={`w-full px-4 py-2 rounded-lg border ${
                   errors.description ? "border-red-500" : "border-gray-200"
                 } focus:outline-none focus:border-blue-500 transition-colors`}

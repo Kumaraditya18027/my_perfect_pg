@@ -33,7 +33,7 @@ const AllBookings: React.FC = () => {
         const data = await response.json();
         setBookedPGs(data?.data || []);
         setLoading(false);
-      } catch (err: any) {
+      } catch (err) {
         setError(err.message);
         setLoading(false);
       }

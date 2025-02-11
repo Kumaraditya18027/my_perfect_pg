@@ -36,7 +36,7 @@ const PgOwnerLayout = ({ children }: { children: React.ReactNode }) => {
 
       await response.json();
       logout();
-    } catch (err: any) {
+    } catch (err) {
       console.log(err.message || "Something went wrong. Please try again.");
       toast.success("Logout failed!", {
         position: "top-right",

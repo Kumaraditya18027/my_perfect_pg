@@ -1,14 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { decryptToken } from "@/utils/secureToken";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // app/pgowner/page.tsx
 const PgOwnerHome = () => {
   const router = useRouter();
   const { currentUserData } = useAuth();
-  const [pgListed, setPgListed] = useState<Array<object>>([]);
+  const [pgListed, setPgListed] = useState<Array<any>>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
@@ -37,9 +39,9 @@ const PgOwnerHome = () => {
         console.log(data);
         setPgListed(data.data);
         setLoading(false);
-      } catch (err: any) {
+      } catch (err) {
         console.error(err);
-        setError("Failed to fetch PG details. Please try again later.");
+        setError(true);
         setLoading(false);
       }
     };
@@ -70,9 +72,11 @@ const PgOwnerHome = () => {
               onClick={() => router.push(`/pgowner/${pg?.uuid}`)}
             >
               <div className="flex space-x-6">
-                <img
-                  src={pg?.pictures[0]}
+                <Image
+                  src={pg?.pictures[0] || "/logo.png"}
                   alt={pg?.name}
+                  width={100}
+                  height={100}
                   className="w-1/3 h-24 rounded-lg object-cover"
                 />
                 <div className="flex-1">

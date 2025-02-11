@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { decryptToken } from "@/utils/secureToken";
+import Image from "next/image";
 
 const OwnerDetailsForm = () => {
   const router = useRouter();
@@ -31,7 +34,7 @@ const OwnerDetailsForm = () => {
     pictures: [],
     deleted: false,
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<any>({});
   const [imagePreviews, setImagePreviews] = useState([]);
 
   const searchParams = useSearchParams();
@@ -100,7 +103,7 @@ const OwnerDetailsForm = () => {
   }
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors = {} as any;
 
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.phone || !/^\d{10}$/.test(formData.phone)) {
@@ -136,7 +139,7 @@ const OwnerDetailsForm = () => {
     setFormData((prev) => ({ ...prev, pictures: files }));
 
     // Create and set image previews
-    const previews = files.map((file) => URL.createObjectURL(file));
+    const previews = files.map((file) => URL.createObjectURL(file as Blob));
     setImagePreviews(previews);
 
     // Clean up old previews
@@ -172,14 +175,14 @@ const OwnerDetailsForm = () => {
     formDataToSend.append("rooms", JSON.stringify(rooms));
     formDataToSend.append("services", JSON.stringify(services)); // Serialize arrays or objects
     formDataToSend.append("description", description);
-    formDataToSend.append("rating", rating);
+    formDataToSend.append("rating", rating.toString());
     formDataToSend.append("longitude", longitude);
     formDataToSend.append("latitude", latitude);
     formDataToSend.append("timings", timings);
 
     // Append pictures if available
     if (formData.pictures && formData.pictures.length > 0) {
-      formData.pictures.forEach((picture, index) => {
+      formData.pictures.forEach((picture) => {
         formDataToSend.append(`pictureFiles`, picture); // Files go directly
       });
     }
@@ -214,80 +217,14 @@ const OwnerDetailsForm = () => {
         throw new Error("Submission failed. Please check your data.");
       }
 
-      const data = await response.json();
+      await response.json();
       // console.log(data);
       router.push("/pgowner");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Submission error:", error);
       setErrors(error.message || "Something went wrong. Please try again.");
     }
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   console.log("Form submission started");
-
-  //   if (!validateForm()) {
-  //     console.log("Form validation failed", errors);
-  //     return;
-  //   }
-
-  //   // Update owner details
-  //   setOwnerName(formData.name);
-  //   setOwnerPhone(formData.phone);
-  //   setOwnerEmail(formData.email);
-  //   setProfession(formData.profession);
-
-  //   // Prepare submission data
-  //   const submissionData = {
-  //     name,
-  //     address,
-  //     gender,
-  //     rooms,
-  //     services,
-  //     description,
-  //     rating,
-  //     longitude,
-  //     latitude,
-  //     timings,
-  //     // pictures: formData.pictures,
-  //     // ownerDetails: {
-  //     //   name: formData.name, // Use formData directly
-  //     //   phone: formData.phone, // Use formData directly
-  //     //   email: formData.email, // Use formData directly
-  //     //   address: formData.address, // Use correct property name
-  //     // },
-  //     profession: formData.profession,
-  //   };
-
-  //   console.log("Data to be submitted:", submissionData);
-
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/pgowner/add-pg`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-  //         },
-  //         body: JSON.stringify(submissionData),
-  //       }
-  //     );
-
-  //     console.log(response);
-
-  //     if (!response.ok) {
-  //       throw new Error("Submission failed. Please check your data.");
-  //     }
-
-  //     const data = await response.json();
-  //     console.log(data);
-  //   } catch (error: any) {
-  //     console.error("Submission error:", error);
-  //     setErrors(error.message || "Something went wrong. Please try again.");
-  //   }
-  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8 px-4">
@@ -380,7 +317,7 @@ const OwnerDetailsForm = () => {
             <input
               type="text"
               name="address"
-              value={formData.ownerAddress}
+              value={formData.address}
               onChange={handleChange}
               className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
               placeholder="Enter the address"
@@ -404,10 +341,12 @@ const OwnerDetailsForm = () => {
             />
             <div className="mt-4 flex gap-4 flex-wrap">
               {imagePreviews.map((src, index) => (
-                <img
+                <Image
                   key={index}
-                  src={src}
+                  src={src || "/logo.png"}
                   alt={`Preview ${index}`}
+                  width={100}
+                  height={100}
                   className="w-24 h-24 object-cover rounded-lg shadow-md"
                 />
               ))}

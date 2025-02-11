@@ -12,6 +12,7 @@ interface AuthContextType {
     bio: string;
     phone: string;
     avatar: string;
+    address: string;
     bookmarkedPg: Array<{
       name: string;
       address: string;
@@ -49,6 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           bio: string;
           phone: string;
           avatar: string;
+          address: string;
           bookmarkedPg: {
             name: string;
             address: string;
@@ -95,6 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         bio: string;
         phone: string;
         avatar: string;
+        address: string;
         bookmarkedPg: {
           name: string;
           address: string;

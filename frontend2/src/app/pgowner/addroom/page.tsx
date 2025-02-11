@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 interface Features {
@@ -89,13 +90,13 @@ const AddRoom: React.FC = () => {
   const handleRoomChange = (
     index: number,
     field: string,
-    value: string | boolean | string[],
+    value: string | boolean | string[]
   ) => {
     setRooms((prev) => {
       const updatedRooms = [...prev];
       if (field.includes(".")) {
         const [group, subField] = field.split(".");
-        (updatedRooms[index][group as keyof Room] as any)[subField] = value;
+        updatedRooms[index][group as keyof Room][subField] = value;
       } else {
         updatedRooms[index][field as keyof Room] = value as never;
       }
@@ -103,7 +104,7 @@ const AddRoom: React.FC = () => {
     });
   };
 
-  const handleServicesChange = (field: keyof Services, value: any) => {
+  const handleServicesChange = (field: keyof Services, value) => {
     setServices((prev) => ({
       ...prev,
       [field]: value,
@@ -134,11 +135,6 @@ const AddRoom: React.FC = () => {
       router.push(`/pgowner/addOwnerDetails?${queryString}`);
     }
   };
-
-  // Debug logging
-  useEffect(() => {
-    console.log("Current search parameters:", getAllSearchParams());
-  }, [searchParams]);
 
   const addRoom = () => {
     setRooms((prev) => [
@@ -231,7 +227,7 @@ const AddRoom: React.FC = () => {
                         handleRoomChange(
                           index,
                           "features.furnished",
-                          e.target.checked,
+                          e.target.checked
                         )
                       }
                       className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
@@ -272,7 +268,7 @@ const AddRoom: React.FC = () => {
                       handleRoomChange(
                         index,
                         "pictures",
-                        Array.from(e.target.files).map((file) => file.name),
+                        Array.from(e.target.files).map((file) => file.name)
                       )
                     }
                     className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-colors"
@@ -339,13 +335,13 @@ const AddRoom: React.FC = () => {
                       type="checkbox"
                       checked={services[service]}
                       onChange={(e) =>
-                        handleServicesChange(service, e.target.checked)
+                        handleServicesChange(service as any, e.target.checked)
                       }
                       className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                     />
                     <span className="text-gray-700 capitalize">{service}</span>
                   </label>
-                ),
+                )
               )}
 
               <label className="block text-gray-700 font-medium mb-1">
@@ -356,7 +352,7 @@ const AddRoom: React.FC = () => {
                 onChange={(e) =>
                   handleServicesChange(
                     "otherServices",
-                    e.target.value.split(",").map((s) => s.trim()),
+                    e.target.value.split(",").map((s) => s.trim())
                   )
                 }
                 className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
