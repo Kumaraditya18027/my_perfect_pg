@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import Loading from "@/components/Loading";
 import { decryptToken } from "@/utils/secureToken";
