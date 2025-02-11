@@ -102,7 +102,7 @@ const BookingRow = ({ booking }) => {
       <td className="pl-6 py-5 rounded-l-xl">
         <div className="flex items-center justify-center">
           <Image
-            src={booking.pg.picture}
+            src={booking.pg.picture || "/logo.png"}
             alt="PG image"
             width={50}
             height={50}
@@ -112,8 +112,9 @@ const BookingRow = ({ booking }) => {
       </td>
       <td className="px-6 py-5">{booking.pg.name}</td>
       <td className="px-6 py-5">{booking.pg.address || "N/A"}</td>
-      <td className="px-6 py-5">{booking.pg.phone || "N/A"}</td>
-      <td className="px-6 py-5">{booking.pg.amount || "N/A"}</td>
+      <td className="px-6 py-5">{booking.user.name || "N/A"}</td>
+      <td className="px-6 py-5">{booking.user.phone || "N/A"}</td>
+      <td className="px-6 py-5">{booking.user.email || "N/A"}</td>
       <td className="px-6 py-5">
         {error ? (
           <span className="text-red-500">{error}</span>
@@ -223,10 +224,13 @@ function PgBookingRequests() {
                   Location
                 </th>
                 <th scope="col" className="px-6 py-3 font-semibold">
-                  Phone
+                  Booker Name
                 </th>
                 <th scope="col" className="px-6 py-3 font-semibold">
-                  Amount
+                  Booker Phone
+                </th>
+                <th scope="col" className="px-6 py-3 font-semibold">
+                  Booker Email
                 </th>
                 <th scope="col" className="px-6 py-3 font-semibold">
                   Assigned Employee

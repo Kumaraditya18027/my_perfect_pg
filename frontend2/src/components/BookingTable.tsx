@@ -132,11 +132,11 @@ const BookingTable: React.FC<BookingTableProps> = ({
               <td className="px-4 py-3">
                 <div className="flex items-center">
                   <Image
-                    src={booking.pg?.picture || "/placeholder.png"}
+                    src={booking.pg?.picture || "/logo.png"}
                     alt="pg-image"
                     width={50}
                     height={50}
-                    className="rounded-lg"
+                    className="rounded-lg w-16 h-16 object-contain"
                   />
                 </div>
               </td>

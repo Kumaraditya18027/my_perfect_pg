@@ -37,7 +37,6 @@ const Page: React.FC = () => {
     { title: "Total PG", value: 0 },
     { title: "Total Employees", value: 0 },
     { title: "Total Rooms", value: 0 },
-    // You can add more stats like Total Employees, Total Rooms if desired.
   ]);
   const [labels, setLabels] = useState<string[]>([]);
   const [bookingRequestData, setBookingRequestData] = useState<number[]>([]);
@@ -62,6 +61,7 @@ const Page: React.FC = () => {
         );
         if (!response.ok) throw new Error("Failed to fetch dashboard stats");
         const data = await response.json();
+        console.log(data);
         // Update stats based on your API structure
         setStats([
           { title: "Booking Request", value: data.data.totalBookingCount },
@@ -69,9 +69,9 @@ const Page: React.FC = () => {
           { title: "Total PG", value: data.data.totalPgCount },
           { title: "Total Rooms", value: data.data.totalRoomCount },
         ]);
-        setLabels(data.bookingRequest.labels || []);
-        setBookingRequestData(data.bookingRequest.data || []);
-        setBookedData(data.booked.data || []);
+        setLabels(data.bookingRequest?.labels || []);
+        setBookingRequestData(data.bookingRequest?.data || []);
+        setBookedData(data.booked?.data || []);
       } catch (err) {
         console.error("Dashboard data error:", err.message);
       } finally {

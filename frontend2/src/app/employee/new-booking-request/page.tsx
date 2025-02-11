@@ -39,6 +39,7 @@ const BookingRow = ({ booking }) => {
 
         const data = await response.json();
         setMembers(data?.data || []);
+        console.log(data.data);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -104,14 +105,15 @@ const BookingRow = ({ booking }) => {
             alt="PG image"
             width={50}
             height={50}
-            className="rounded-lg"
+            className="rounded-lg w-16 h-16 object-contain"
           />
         </div>
       </td>
       <td className="px-6 py-5">{booking.pg.name}</td>
       <td className="px-6 py-5">{booking.pg.address || "N/A"}</td>
-      <td className="px-6 py-5">{booking.pg.phone || "N/A"}</td>
-      <td className="px-6 py-5">{booking.pg.amount || "N/A"}</td>
+      <td className="px-6 py-5">{booking.user.name || "N/A"}</td>
+      <td className="px-6 py-5">{booking.user.phone || "N/A"}</td>
+      <td className="px-6 py-5">{booking.user.email || "N/A"}</td>
       <td className="px-6 py-5">
         {error ? (
           <span className="text-red-500">{error}</span>
@@ -221,10 +223,13 @@ function PgBookingRequests() {
                   Location
                 </th>
                 <th scope="col" className="px-6 py-3 font-semibold">
-                  Phone
+                  Booker Name
                 </th>
                 <th scope="col" className="px-6 py-3 font-semibold">
-                  Amount
+                  Booker Phone
+                </th>
+                <th scope="col" className="px-6 py-3 font-semibold">
+                  Booker Email
                 </th>
                 <th scope="col" className="px-6 py-3 font-semibold">
                   Assigned Employee

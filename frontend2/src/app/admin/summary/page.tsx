@@ -73,9 +73,9 @@ const Page: React.FC = () => {
           { title: "Total Employees", value: data.data.totalEmployeeCount },
           { title: "Total Rooms", value: data.data.totalRoomCount },
         ]);
-        setLabels(data.bookingRequest.labels || []);
-        setBookingRequestData(data.bookingRequest.data || []);
-        setBookedData(data.booked.data || []);
+        setLabels(data.bookingRequest?.labels || []);
+        setBookingRequestData(data.bookingRequest?.data || []);
+        setBookedData(data.booked?.data || []);
       } catch (err) {
         console.error("Dashboard data error:", err.message);
       } finally {
