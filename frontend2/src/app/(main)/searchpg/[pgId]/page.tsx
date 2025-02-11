@@ -1,6 +1,7 @@
 "use client";
 import Loading from "@/components/Loading";
 import { decryptToken } from "@/utils/secureToken";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { FaMapMarkerAlt, FaWifi, FaParking, FaStar } from "react-icons/fa";
 import { LuCctv } from "react-icons/lu";
@@ -14,6 +15,7 @@ interface PgDetails {
     features: {
       ac: boolean;
       furnished: boolean;
+      fooding: string;
     };
     rates: {
       monthly: number;
@@ -87,7 +89,7 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
           );
           setBookingStatus(bookedRoomTypes);
           setLoading(false);
-        } catch (err: any) {
+        } catch (err) {
           console.error(err);
           setError("Failed to fetch PG details. Please try again later.");
           setLoading(false);
@@ -122,16 +124,16 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
         }
       );
 
-      // console.log(response.json());
       if (!response.ok) {
+        console.log(response.json());
         throw new Error("Failed to request book PG.");
       }
 
-      await response.json();
-      // console.log(data);
+      const data = await response.json();
+      console.log(data);
       setBookingStatus((prev) => [...prev, roomType]);
       setLoading(false);
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message);
       setLoading(false);
     }
@@ -176,9 +178,11 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
               key={index}
               className="relative h-48 w-full overflow-hidden rounded-lg shadow-lg"
             >
-              <img
+              <Image
                 src={pic || "/midlandpark.jpg"}
                 alt={`PG Image ${index + 1}`}
+                width={100}
+                height={100}
                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
               />
             </div>
@@ -250,6 +254,8 @@ const PgDetailsPage = ({ params }: { params: Promise<{ pgId: string }> }) => {
                           <img
                             src={pic || "/midlandpark.jpg"}
                             alt={`Room Picture ${idx + 1}`}
+                            // width={100}
+                            // height={100}
                             className="w-full h-full object-cover"
                           />
                         </div>

@@ -55,113 +55,6 @@ const LocationIcon = () => (
   </svg>
 );
 
-const pgs = [
-  {
-    id: 1,
-    name: "Midland Park Building",
-    location: "Nayapatti, Salt Lake",
-    price: 7000,
-    rating: 4.2,
-    images: ["/midlandpark.jpg"],
-    amenities: ["WiFi", "Food", "Laundry"],
-    roomTypes: ["Single", "Double"],
-    gender: "Male",
-    available: true,
-    reviews: 18,
-  },
-  {
-    id: 2,
-    name: "Kashana Housing",
-    location: "Action area 1, Newtown",
-    price: 6000,
-    rating: 4.0,
-    images: ["/kashanapg.jpg"],
-    amenities: ["WiFi", "AC", "Gym"],
-    roomTypes: ["Single"],
-    gender: "Female",
-    available: true,
-    reviews: 25,
-  },
-  {
-    id: 3,
-    name: "Barsha PG",
-    location: "Nayapatti, Technopolis, Salt Lake",
-    price: 7000,
-    rating: 4.5,
-    images: ["/barshapg.jpg"],
-    amenities: ["Food", "Laundry"],
-    roomTypes: ["Double", "Triple"],
-    gender: "Female",
-    available: true,
-    reviews: 30,
-  },
-  {
-    id: 4,
-    name: "Maa Santoshi PG",
-    location: "MB 238/1 Near Chitrakut Mahishbathan",
-    price: 6500,
-    rating: 4.3,
-    images: ["/masantoshi.jpg"],
-    amenities: ["WiFi", "Food", "Laundry"],
-    roomTypes: ["Single", "Double"],
-    gender: "Male",
-    available: false,
-    reviews: 20,
-  },
-  {
-    id: 5,
-    name: "Appayan PG",
-    location: "Nayapatti, Technopolis, Salt Lake",
-    price: 7000,
-    rating: 4.6,
-    images: ["/appayan.jpg"],
-    amenities: ["AC", "Food", "WiFi"],
-    roomTypes: ["Single", "Double"],
-    gender: "Male",
-    available: true,
-    reviews: 28,
-  },
-  {
-    id: 6,
-    name: "Sabita PG",
-    location: "Nayapatti, Technopolis, Salt Lake",
-    price: 6800,
-    rating: 4.7,
-    images: ["/sabitapg.jpg"],
-    amenities: ["WiFi", "Food", "Gym"],
-    roomTypes: ["Single", "Double"],
-    gender: "Female",
-    available: false,
-    reviews: 35,
-  },
-  {
-    id: 7,
-    name: "Narayan House",
-    location: "Krishnapur Main Road, Mohisgote",
-    price: 8000,
-    rating: 4.9,
-    images: ["/narayanhouse.jpg"],
-    amenities: ["AC", "Laundry", "Gym"],
-    roomTypes: ["Single"],
-    gender: "Male",
-    available: true,
-    reviews: 42,
-  },
-  {
-    id: 8,
-    name: "Asha PG",
-    location: "CL Block, Sector 2, Salt Lake",
-    price: 7000,
-    rating: 4.4,
-    images: ["/ashapg.jpg"],
-    amenities: ["WiFi", "Food", "Laundry"],
-    roomTypes: ["Double", "Triple"],
-    gender: "Female",
-    available: true,
-    reviews: 19,
-  },
-];
-
 const PGShowcase = () => {
   const router = useRouter();
   const [selectedFilters, setSelectedFilters] = useState({
@@ -231,7 +124,7 @@ const PGShowcase = () => {
 
         setPg(pgData);
         setLoading(false);
-      } catch (err: any) {
+      } catch (err) {
         console.error(err);
         setError("Failed to fetch PG details. Please try again later.");
         setLoading(false);

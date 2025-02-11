@@ -7,10 +7,12 @@ import toast from "react-hot-toast";
 
 // A dedicated component for rendering each booking row.
 const BookingRow = ({ booking }) => {
-  // Manage the assigned member and status locally for each booking.
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(
-    booking.pg.assign_member || ""
+    booking.assignedMember?.name || ""
+  );
+  const [isMemberAssigned, setMemberAssigned] = useState(
+    booking.status === "assigned"
   );
   const [status, setStatus] = useState(booking.status);
   const [loading, setLoading] = useState(true);
@@ -21,7 +23,7 @@ const BookingRow = ({ booking }) => {
       try {
         const token = decryptToken(localStorage.getItem("authToken") || "");
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/employee/get-employee`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/employee/get-employees`,
           {
             method: "GET",
             headers: {
@@ -47,13 +49,7 @@ const BookingRow = ({ booking }) => {
     fetchEmployees();
   }, []);
 
-  // Determine if the booking has been assigned
-  const isAssigned = status === "assigned";
-
   const handleAssign = async () => {
-    // Prevent any action if already assigned
-    if (isAssigned) return;
-
     // Ensure a member has been selected
     if (!selectedMember) {
       alert("Please select a member first.");
@@ -69,7 +65,7 @@ const BookingRow = ({ booking }) => {
 
       // Make the POST request to assign the employee
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/employee/assign-employee`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/assign-employee`,
         {
           method: "PATCH",
           headers: {
@@ -87,6 +83,10 @@ const BookingRow = ({ booking }) => {
 
       const data = await response.json();
       // Update status to disable further changes upon success
+      const member = members.find((member) => member.uuid === selectedMember);
+      const memberName = member ? member.name : "";
+      setMemberAssigned(true);
+      setSelectedMember(memberName);
       setStatus("assigned");
 
       toast.success(data.message);
@@ -115,14 +115,8 @@ const BookingRow = ({ booking }) => {
       <td className="px-6 py-5">
         {error ? (
           <span className="text-red-500">{error}</span>
-        ) : isAssigned ? (
-          (() => {
-            const member = members.find(
-              (member) => member.uuid === selectedMember
-            );
-            const memberName = member ? member.name : "Unknown Member";
-            return <span>{memberName}</span>;
-          })()
+        ) : isMemberAssigned ? (
+          <span>{selectedMember}</span>
         ) : (
           <>
             <select
@@ -144,9 +138,9 @@ const BookingRow = ({ booking }) => {
             </select>
             <button
               onClick={handleAssign}
-              disabled={isAssigned}
+              disabled={isMemberAssigned}
               className={`bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded ${
-                isAssigned ? "opacity-50 cursor-not-allowed" : ""
+                isMemberAssigned ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
               Assign
@@ -170,7 +164,7 @@ function PgBookingRequests() {
         const storedToken = localStorage.getItem("authToken") || "";
         const token = decryptToken(storedToken);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/employee/get-all-bookings`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/employee/get-all-bookings?status=pending`,
           {
             method: "GET",
             headers: {

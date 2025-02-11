@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaArrowRight, FaBell, FaMapMarkerAlt } from "react-icons/fa";
 import { Line } from "react-chartjs-2";
 import { ChartData } from "chart.js";
@@ -16,6 +17,7 @@ import {
 } from "chart.js";
 import Link from "next/link";
 import Image from "next/image";
+import { decryptToken } from "@/utils/secureToken";
 
 ChartJS.register(
   CategoryScale,
@@ -28,22 +30,59 @@ ChartJS.register(
 );
 
 const Page: React.FC = () => {
-  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
+  // Dashboard Stats & Chart Data State
+  const [stats, setStats] = useState([
+    { title: "Booking Request", value: 0 },
+    { title: "Booked", value: 0 },
+    { title: "Total PG", value: 0 },
+    { title: "Total Employees", value: 0 },
+    { title: "Total Rooms", value: 0 },
+    // You can add more stats like Total Employees, Total Rooms if desired.
+  ]);
+  const [labels, setLabels] = useState<string[]>([]);
+  const [bookingRequestData, setBookingRequestData] = useState<number[]>([]);
+  const [bookedData, setBookedData] = useState<number[]>([]);
+  const [loadingDashboard, setLoadingDashboard] = useState<boolean>(false);
 
-  // Data for the charts (mock data for example purposes)
-  const labels: string[] = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Yesterday",
-    "Today",
-  ];
+  // Fetch Dashboard Data (stats + chart data)
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const token = decryptToken(localStorage.getItem("authToken") || "");
+        setLoadingDashboard(true);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/dashboard-stats`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!response.ok) throw new Error("Failed to fetch dashboard stats");
+        const data = await response.json();
+        // Update stats based on your API structure
+        setStats([
+          { title: "Booking Request", value: data.data.totalBookingCount },
+          { title: "Booked", value: data.data.totalBookedPgCount },
+          { title: "Total PG", value: data.data.totalPgCount },
+          { title: "Total Rooms", value: data.data.totalRoomCount },
+        ]);
+        setLabels(data.bookingRequest.labels || []);
+        setBookingRequestData(data.bookingRequest.data || []);
+        setBookedData(data.booked.data || []);
+      } catch (err) {
+        console.error("Dashboard data error:", err.message);
+      } finally {
+        setLoadingDashboard(false);
+      }
+    };
 
-  const bookingRequestData: number[] = [100, 120, 150, 180, 170, 130, 140];
-  const bookedData: number[] = [60, 50, 70, 80, 75, 65, 90];
+    fetchDashboardData();
+  }, []);
 
+  // Prepare chart data objects
   const bookingRequestChartData: ChartData<"line"> = {
     labels,
     datasets: [
@@ -71,19 +110,6 @@ const Page: React.FC = () => {
       },
     ],
   };
-
-  const stats = [
-    { title: "Booking Request", value: 1000 },
-    { title: "Booked", value: 100 },
-    { title: "Total PG", value: 67 },
-  ];
-
-  const members: string[] = [
-    "Rajgopal Kumar",
-    "Sunny Kumar",
-    "Kumar Raj",
-    "R Kumar",
-  ];
 
   return (
     <div className="flex-grow bg-white">
@@ -121,72 +147,11 @@ const Page: React.FC = () => {
           >
             <p>PG Owners</p>
           </Link>
-
-          {/* Popup */}
-          {isPopupOpen && (
-            <>
-              <div
-                className="fixed inset-0 bg-black opacity-50 z-10"
-                onClick={() => setPopupOpen(false)}
-              ></div>
-
-              <div className="absolute mt-4 right-0 left-auto bg-white p-6 rounded-lg shadow-lg max-w-md w-80 z-20">
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => setPopupOpen(false)}
-                    className="text-lg text-black bg-gray-50 hover:bg-gray-200 w-8 h-8 rounded-full"
-                  >
-                    X
-                  </button>
-                </div>
-                <div className="flex">
-                  <Image
-                    src="/PgImage.png"
-                    alt="PgImage"
-                    width={500}
-                    height={500}
-                    className="w-16 h-16"
-                  />
-                  <div className="ml-2 flex flex-col">
-                    <h2 className="text-xl font-semibold">Bla Bla PG</h2>
-                    <span className="flex">
-                      <FaMapMarkerAlt className="text-gray-900 mt-1 text-lg mr-1" />{" "}
-                      <span className="text-lg">Kolkata</span>
-                    </span>
-                    <p className="text-gray-700">₹ 5,000</p>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <select className="mt-4 w-full p-2 border border-gray-300 rounded">
-                    {members.map((member, index) => (
-                      <option key={index} value={member}>
-                        {member}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="mt-6 flex justify-between w-full">
-                    <button
-                      onClick={() => setPopupOpen(false)}
-                      className="bg-red-400 hover:bg-red-500 text-white py-2 w-32 px-4 rounded"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => setPopupOpen(false)}
-                      className="bg-green-400 hover:bg-green-500 text-white py-2 w-32 px-4 rounded ml-4"
-                    >
-                      Verify
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
         </div>
       </div>
 
       {/* Summary stats */}
-      <div className="mt-2 text-white bg-blue-600 grid grid-cols-3 py-16 rounded-[16px]">
+      <div className="mt-2 text-white bg-blue-600 grid grid-cols-3 gap-5 py-16 rounded-[16px]">
         {stats.map((stat, index) => (
           <div
             key={index}
@@ -196,7 +161,9 @@ const Page: React.FC = () => {
           >
             <h2 className="text-lg">{stat.title}</h2>
             <div className="inline-flex items-center">
-              <p className="text-4xl font-bold">{stat.value}</p>
+              <p className="text-4xl font-bold">
+                {stat.value.toString().padStart(2, "0")}
+              </p>
               <FaArrowRight className="text-blue-600 bg-white text-normal text-md w-6 h-6 p-1 rounded-full ml-2" />
             </div>
           </div>
@@ -211,16 +178,8 @@ const Page: React.FC = () => {
             data={bookingRequestChartData}
             options={{
               scales: {
-                x: {
-                  grid: {
-                    display: false,
-                  },
-                },
-                y: {
-                  grid: {
-                    display: false,
-                  },
-                },
+                x: { grid: { display: false } },
+                y: { grid: { display: false } },
               },
             }}
           />
@@ -231,16 +190,8 @@ const Page: React.FC = () => {
             data={bookedChartData}
             options={{
               scales: {
-                x: {
-                  grid: {
-                    display: false,
-                  },
-                },
-                y: {
-                  grid: {
-                    display: false,
-                  },
-                },
+                x: { grid: { display: false } },
+                y: { grid: { display: false } },
               },
             }}
           />

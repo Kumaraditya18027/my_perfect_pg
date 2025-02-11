@@ -1,21 +1,21 @@
 "use client";
-import Image from "next/image";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { FaArrowCircleRight } from "react-icons/fa";
 import { decryptToken } from "@/utils/secureToken";
+import BookingTable from "@/components/BookingTable";
 
 const Booked: React.FC = () => {
   const [bookedPGs, setBookedPGs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [pgNameFilter, setPgNameFilter] = useState("");
+  const [employeeFilter, setEmployeeFilter] = useState("");
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
         const token = decryptToken(localStorage.getItem("authToken") || "");
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/employee/get-all-bookings`,
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/employee/get-all-bookings?status=assigned`,
           {
             method: "GET",
             headers: {
@@ -55,74 +55,13 @@ const Booked: React.FC = () => {
       )}
 
       {!loading && bookedPGs.length > 0 && (
-        <div className="relative overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-500 border-separate border-spacing-y-3">
-            <thead className="text-gray-700 bg-gray-100">
-              <tr>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Image
-                </th>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Location
-                </th>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Amount
-                </th>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Assigned Member
-                </th>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Phone Number
-                </th>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookedPGs.map((booking, index) => (
-                <tr
-                  key={index}
-                  className="bg-white shadow-md rounded-lg hover:shadow-lg transition-all duration-300"
-                >
-                  <td className="pl-6 py-5 rounded-l-xl">
-                    <div className="flex items-center">
-                      <Image
-                        src={booking.pg.picture}
-                        alt="pg-image"
-                        width={50}
-                        height={50}
-                        className="size-12 rounded-lg"
-                      />
-                    </div>
-                  </td>
-                  <td className="px-6 py-5">{booking.pg.name}</td>
-                  <td className="px-6 py-5">{booking.pg.address}</td>
-                  <td className="px-6 py-5">{booking.pg.amount}</td>
-                  <td className="px-6 py-5">{booking.pg.assign_member}</td>
-                  <td className="px-6 py-5">{booking.pg.phone}</td>
-                  <td className="px-6 py-5">{booking.status}</td>
-                  <td className="pr-6 py-5 rounded-r-xl">
-                    <Link
-                      href={`/admin/bookedpg/${booking.pg.name
-                        ?.split(" ")
-                        .join("-")
-                        .toLowerCase()}`}
-                    >
-                      <FaArrowCircleRight className="text-2xl text-blue-500 hover:text-blue-600 transition" />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <BookingTable
+          bookedPGs={bookedPGs}
+          pgNameFilter={pgNameFilter}
+          setPgNameFilter={setPgNameFilter}
+          employeeFilter={employeeFilter}
+          setEmployeeFilter={setEmployeeFilter}
+        />
       )}
     </div>
   );
