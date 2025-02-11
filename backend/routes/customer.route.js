@@ -11,6 +11,8 @@ const {
 const {
   bookmarkPg,
   editProfile,
+  getBookmarkedPgs,
+  getMyBookings,
 } = require("../controllers/customer/profile.controller.js");
 
 //authentication
@@ -21,6 +23,7 @@ router.route("/customer/get-all-pgs").get(authHandler(), getAllPgs);
 router.route("/customer/get-nearby-pg").get(authHandler(), getNearbyPGs);
 router.route("/customer/get-pg-details/:pgId").get(authHandler(), getPgDetails);
 router.route("/customer/bookmark-pg").post(authHandler(), bookmarkPg);
+router.route("/customer/get-my-bookings").get(authHandler(), getMyBookings);
 
 //profile
 router.route("/customer/edit-profile").patch(authHandler(), editProfile);

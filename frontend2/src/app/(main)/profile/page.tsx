@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { decryptToken } from "@/utils/secureToken";
+import Image from "next/image";
 
 const COLOR_SCHEME = {
   primary: {
@@ -30,6 +31,20 @@ export default function ProfilePage() {
   const [selectedBookmark, setSelectedBookmark] = useState(null);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
+  const [preferences, setPreferences] = useState({
+    gender: "female",
+    roomType: "single",
+    ac: true,
+    foodType: "veg",
+    budget: [10000, 15000],
+    amenities: ["wifi", "laundry"],
+    location: "",
+  });
+  const [isEditPreferencesOpen, setEditPreferencesOpen] =
+    useState<boolean>(false);
+  const [editPreferences, setEditPreferences] = useState(preferences);
+
+  const [currentBooking, setCurrentBooking] = useState(null);
 
   const [user, setUser] = useState({
     name: currentUserData?.name,
@@ -55,6 +70,50 @@ export default function ProfilePage() {
     },
     bookmarks: currentUserData?.bookmarkedPg,
   });
+
+  useEffect(() => {
+    const fetchBookingData = async () => {
+      try {
+        const token = decryptToken(localStorage.getItem("authToken"));
+        const bookingResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/customer/get-my-bookings`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!bookingResponse.ok) {
+          throw new Error("Failed to fetch booking details.");
+        }
+
+        const data = await bookingResponse.json();
+        console.log(data);
+        setCurrentBooking(data.data);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+      }
+    };
+
+    fetchBookingData();
+  }, []);
+
+  // When opening the modal, initialize editPreferences from the current preferences
+  const openEditPreferencesModal = () => {
+    setEditPreferences(preferences);
+    setEditPreferencesOpen(true);
+  };
+
+  // Handle form submission
+  const handleEditPreferencesSubmit = (e) => {
+    e.preventDefault();
+    // Update the main preferences state with the new values
+    setPreferences(editPreferences);
+    setEditPreferencesOpen(false);
+  };
 
   const handleProfileImageUpdate = (event) => {
     const file = event.target.files[0];
@@ -85,7 +144,7 @@ export default function ProfilePage() {
             <input
               type="text"
               name="name"
-              defaultValue={currentUserData.name}
+              defaultValue={currentUserData?.name}
               className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
           </div>
@@ -96,7 +155,7 @@ export default function ProfilePage() {
             <input
               type="email"
               name="email"
-              defaultValue={user.email}
+              defaultValue={user?.email}
               className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
           </div>
@@ -107,7 +166,7 @@ export default function ProfilePage() {
             <input
               type="tel"
               name="phone"
-              defaultValue={user.phone}
+              defaultValue={user?.phone}
               className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
           </div>
@@ -117,7 +176,7 @@ export default function ProfilePage() {
             </label>
             <textarea
               name="bio"
-              defaultValue={user.bio}
+              defaultValue={user?.bio}
               rows={3}
               className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
             />
@@ -214,6 +273,122 @@ export default function ProfilePage() {
     showNotification("Bookmark removed successfully!");
   };
 
+  // Add Preferences Section
+  const PreferencesSection = () => (
+    <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+      <h3 className="text-xl font-semibold mb-6">My Preferences</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className={`${COLOR_SCHEME.primary.light} rounded-lg p-4`}>
+          <h4 className="font-medium text-gray-700">Gender</h4>
+          <p className={`mt-1 ${COLOR_SCHEME.primary.text}`}>
+            {preferences.gender}
+          </p>
+        </div>
+        <div className={`${COLOR_SCHEME.primary.light} rounded-lg p-4`}>
+          <h4 className="font-medium text-gray-700">Room Type</h4>
+          <p className={`mt-1 ${COLOR_SCHEME.primary.text}`}>
+            {preferences.roomType}
+          </p>
+        </div>
+        <div className={`${COLOR_SCHEME.primary.light} rounded-lg p-4`}>
+          <h4 className="font-medium text-gray-700">AC Preference</h4>
+          <p className={`mt-1 ${COLOR_SCHEME.primary.text}`}>
+            {preferences.ac ? "AC Required" : "Non-AC Okay"}
+          </p>
+        </div>
+        <div className={`${COLOR_SCHEME.primary.light} rounded-lg p-4`}>
+          <h4 className="font-medium text-gray-700">Food Type</h4>
+          <p className={`mt-1 ${COLOR_SCHEME.primary.text}`}>
+            {preferences.foodType}
+          </p>
+        </div>
+        <div className={`${COLOR_SCHEME.primary.light} rounded-lg p-4`}>
+          <h4 className="font-medium text-gray-700">Budget</h4>
+          <p className={`mt-1 ${COLOR_SCHEME.primary.text}`}>
+            ₹{preferences.budget[0]} - ₹{preferences.budget[1]}
+          </p>
+        </div>
+        <div className={`${COLOR_SCHEME.primary.light} rounded-lg p-4`}>
+          <h4 className="font-medium text-gray-700">Amenities</h4>
+          <p className={`mt-1 ${COLOR_SCHEME.primary.text}`}>
+            {preferences.amenities.join(", ")}
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={openEditPreferencesModal}
+        className={`mt-6 px-4 py-2 text-white rounded-lg bg-gradient-to-r ${COLOR_SCHEME.accent}`}
+      >
+        Edit Preferences
+      </button>
+    </div>
+  );
+
+  // Current PG Booking Section
+  const CurrentPgSection = () => (
+    <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+      <h3 className="text-xl font-semibold mb-6">Current PG Booking</h3>
+      {currentBooking && currentBooking.length > 0 ? (
+        currentBooking.map((cb, index) => {
+          let status, statusClass;
+          switch (cb.status) {
+            case "pending":
+              status = "Pending";
+              statusClass = "bg-yellow-300 text-yellow-700";
+              break;
+            case "assigned":
+              status = "Ongoing";
+              statusClass = "bg-green-200 text-green-600";
+              break;
+            default:
+              status = "Pending";
+              statusClass = "bg-yellow-300 text-yellow-700";
+              break;
+          }
+          return (
+            <div className="flex flex-col md:flex-row gap-6 mt-4" key={index}>
+              <Image
+                src={cb.pg.pictures[0] || "/logo.png"}
+                alt={cb.pg.name}
+                width={500}
+                height={500}
+                className="w-40 h-20 rounded-lg object-cover"
+              />
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="text-lg font-semibold">{cb.pg.name}</h4>
+                    <p className="text-gray-500 mt-1">{cb.pg.address}</p>
+                    <div className="mt-2">
+                      <span
+                        className={`${COLOR_SCHEME.primary.text} font-medium`}
+                      >
+                        Room Type: {cb.roomType}
+                      </span>
+                      <span className="mx-2">•</span>
+                      <span className={`${COLOR_SCHEME.primary.text}`}>
+                        Food: {cb.foodingType}
+                      </span>
+                      <span className="mx-2">•</span>
+                      <span className={`${COLOR_SCHEME.primary.text}`}>
+                        AC: {cb.ac ? "Yes" : "No"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={`px-3 py-1 rounded-full ${statusClass}`}>
+                    {status}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })
+      ) : (
+        <p className="text-gray-500">No active bookings found</p>
+      )}
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-8 mt-12">
@@ -222,9 +397,11 @@ export default function ProfilePage() {
           {/* Left Section: Profile Image and Details */}
           <div className="flex items-start space-x-6">
             <div className="relative">
-              <img
-                src={user.profileImage}
+              <Image
+                src={user.profileImage || "/logo.png"}
                 alt="Profile"
+                width={500}
+                height={500}
                 className="w-24 h-24 rounded-full object-cover"
               />
               <label
@@ -258,82 +435,28 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        {/* Preferences Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-          <h3 className="text-xl font-semibold mb-6">My Preferences</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Object.entries(user.preferences).map(([key, value]) => (
-              <div
-                key={key}
-                className={`${COLOR_SCHEME.primary.light} rounded-lg p-4`}
-              >
-                <h4 className="font-medium text-gray-700 capitalize">{key}</h4>
-                <p className={`mt-1 ${COLOR_SCHEME.primary.text}`}>
-                  {Array.isArray(value) ? value.join(", ") : value}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Add Preferences Section */}
+        <PreferencesSection />
 
         {/* Current PG Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-          <h3 className="text-xl font-semibold mb-6">Current PG</h3>
-          <div className="flex flex-col md:flex-row gap-6">
-            <img
-              src={user.currentPG.image}
-              alt={user.currentPG.name}
-              className="w-full md:w-1/3 rounded-lg object-cover"
-            />
-            <div className="flex-1">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="text-lg font-semibold">
-                    {user.currentPG.name}
-                  </h4>
-                  <p className="text-gray-500 mt-1">{user.currentPG.address}</p>
-                </div>
-                <div
-                  className={`px-3 py-1 rounded-full ${COLOR_SCHEME.primary.light} ${COLOR_SCHEME.primary.text}`}
-                >
-                  {user.currentPG.rent}
-                </div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {user.currentPG.amenities.map((amenity, index) => (
-                  <span
-                    key={index}
-                    className={`px-3 py-1 rounded-full ${COLOR_SCHEME.primary.light} ${COLOR_SCHEME.primary.text} text-sm`}
-                  >
-                    {amenity}
-                  </span>
-                ))}
-              </div>
-              <div className="mt-4 flex items-center space-x-2">
-                <span className="text-yellow-400">★</span>
-                <span className="font-medium">{user.currentPG.rating}</span>
-                <span className="text-gray-500">
-                  • Joined {user.currentPG.joinedDate}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CurrentPgSection />
 
         {/* Bookmarked PGs */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h3 className="text-xl font-semibold mb-6">Bookmarked PGs</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {currentUserData?.bookmarkedPg?.length > 0 &&
+            {currentUserData?.bookmarkedPg?.length > 0 ? (
               currentUserData.bookmarkedPg.map((bookmark) => (
                 <div
                   key={bookmark.name}
                   className="group relative bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-all duration-300"
                 >
                   <div className="flex space-x-4">
-                    <img
-                      src={bookmark.pictures[0]}
+                    <Image
+                      src={bookmark.pictures[0] || "/logo.png"}
                       alt={bookmark.name}
+                      width={500}
+                      height={500}
                       className="w-1/3 rounded-lg object-cover"
                     />
                     <div className="flex-1">
@@ -362,7 +485,10 @@ export default function ProfilePage() {
                     </button>
                   </div>
                 </div>
-              ))}
+              ))
+            ) : (
+              <p className="text-gray-500">No bookmarked pgs available</p>
+            )}
           </div>
         </div>
       </main>
@@ -391,6 +517,186 @@ export default function ProfilePage() {
                 Remove
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Preferences Modal */}
+      {isEditPreferencesOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
+            <h3 className="text-xl font-semibold mb-4">Edit Preferences</h3>
+            <form onSubmit={handleEditPreferencesSubmit}>
+              {/* Gender */}
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-1">
+                  Gender
+                </label>
+                <select
+                  value={editPreferences.gender}
+                  onChange={(e) =>
+                    setEditPreferences({
+                      ...editPreferences,
+                      gender: e.target.value,
+                    })
+                  }
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              {/* Room Type */}
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-1">
+                  Room Type
+                </label>
+                <select
+                  value={editPreferences.roomType}
+                  onChange={(e) =>
+                    setEditPreferences({
+                      ...editPreferences,
+                      roomType: e.target.value,
+                    })
+                  }
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="single">Single</option>
+                  <option value="double">Double</option>
+                  <option value="triple">Triple</option>
+                </select>
+              </div>
+              {/* AC Preference */}
+              <div className="mb-4 flex items-center">
+                <input
+                  type="checkbox"
+                  id="ac"
+                  checked={editPreferences.ac}
+                  onChange={(e) =>
+                    setEditPreferences({
+                      ...editPreferences,
+                      ac: e.target.checked,
+                    })
+                  }
+                  className="mr-2"
+                />
+                <label htmlFor="ac" className="text-gray-700 font-medium">
+                  AC Required
+                </label>
+              </div>
+              {/* Food Type */}
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-1">
+                  Food Type
+                </label>
+                <select
+                  value={editPreferences.foodType}
+                  onChange={(e) =>
+                    setEditPreferences({
+                      ...editPreferences,
+                      foodType: e.target.value,
+                    })
+                  }
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="veg">Veg</option>
+                  <option value="non-veg">Non-Veg</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
+              {/* Budget */}
+              <div className="mb-4 grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-700 font-medium mb-1">
+                    Min Budget
+                  </label>
+                  <input
+                    type="number"
+                    value={editPreferences.budget[0]}
+                    onChange={(e) => {
+                      const newBudget = [...editPreferences.budget];
+                      newBudget[0] = Number(e.target.value);
+                      setEditPreferences({
+                        ...editPreferences,
+                        budget: newBudget,
+                      });
+                    }}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-1">
+                    Max Budget
+                  </label>
+                  <input
+                    type="number"
+                    value={editPreferences.budget[1]}
+                    onChange={(e) => {
+                      const newBudget = [...editPreferences.budget];
+                      newBudget[1] = Number(e.target.value);
+                      setEditPreferences({
+                        ...editPreferences,
+                        budget: newBudget,
+                      });
+                    }}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              {/* Amenities */}
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-1">
+                  Amenities (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={editPreferences.amenities.join(", ")}
+                  onChange={(e) =>
+                    setEditPreferences({
+                      ...editPreferences,
+                      amenities: e.target.value
+                        .split(",")
+                        .map((item) => item.trim()),
+                    })
+                  }
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              {/* Location */}
+              <div className="mb-4">
+                <label className="block text-gray-700 font-medium mb-1">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  value={editPreferences.location}
+                  onChange={(e) =>
+                    setEditPreferences({
+                      ...editPreferences,
+                      location: e.target.value,
+                    })
+                  }
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              {/* Actions */}
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setEditPreferencesOpen(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

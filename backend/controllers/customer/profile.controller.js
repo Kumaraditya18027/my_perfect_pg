@@ -1,4 +1,5 @@
 const Pg = require("../../models/pg.model");
+const Booking = require("../../models/booking.model");
 const User = require("../../models/user.model");
 const asyncHandler = require("../../utils/asyncHandler");
 const uploadFileOnCloudinary = require("../../utils/cloudinary");
@@ -41,15 +42,12 @@ const editProfile = asyncHandler(async (req, res) => {
 const bookmarkPg = asyncHandler(async (req, res) => {
   const { pgId } = req.body;
   const userId = req.user._id;
-  console.log(userId);
 
   if (!userId || !pgId) {
     throw new ValidationError("User ID and PG ID required!");
   }
 
-  const user = await User.findById(userId).select(
-    "-_id -refreshToken -password"
-  );
+  const user = await User.findById(userId).select("-refreshToken -password");
   if (!user) {
     throw new NotFoundError("User not found!");
   }
@@ -60,13 +58,34 @@ const bookmarkPg = asyncHandler(async (req, res) => {
   }
 
   // Update user's bookmarked pg list
-  user.bookmarkedPg.push(pg._id);
+  user.bookmarkedPg = [...user.bookmarkedPg, pg._id];
   await user.save();
 
   // Respond with success message
   return res
     .status(200)
     .json(new ResponseHandler(200, "PG bookmarked successfully!", user));
+});
+
+const getMyBookings = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const user = await User.findById(userId).select(
+    "-_id -refreshToken -password"
+  );
+  if (!user) {
+    throw new NotFoundError("User not found!");
+  }
+  const bookings = await Booking.find({
+    $and: [{ user: userId }, { status: { $in: ["pending", "assigned"] } }],
+  })
+    .select("-assignedBy -assignedMember")
+    .populate("pg");
+
+  return res
+    .status(200)
+    .json(
+      new ResponseHandler(200, "Booked PGs fetched successfully!", bookings)
+    );
 });
 
 const uploadProfilePic = asyncHandler(async (req, res) => {
@@ -107,4 +126,5 @@ module.exports = {
   editProfile,
   bookmarkPg,
   uploadProfilePic,
+  getMyBookings,
 };
