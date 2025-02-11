@@ -34,12 +34,12 @@ const bookingSchema = new mongoose.Schema(
     assignedMember: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      // required: true,
     },
     assignedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      // required: true,
     },
   },
   { timestamps: true }
