@@ -1,4 +1,6 @@
 "use client";
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 import { decryptToken } from "@/utils/secureToken";
 import Image from "next/image";
@@ -7,7 +9,6 @@ import toast from "react-hot-toast";
 
 // A dedicated component for rendering each booking row.
 const BookingRow = ({ booking }) => {
-  // console.log(booking.assignedMember?.name);
   // Manage the assigned member and status locally for each booking.
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(

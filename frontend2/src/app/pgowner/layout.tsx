@@ -54,7 +54,6 @@ const PgOwnerLayout = ({ children }: { children: React.ReactNode }) => {
     { href: "../", label: "Home" },
     { href: "", label: "Dashboard" },
     { href: "addPg", label: "Add PG" },
-    { href: "bookings", label: "Bookings" },
   ];
 
   return (
